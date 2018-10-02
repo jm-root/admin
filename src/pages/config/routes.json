@@ -1,0 +1,8 @@
+[
+  {
+    "path": "/config",
+    "name": "config",
+    "icon": "setting",
+    "component": "./config/index"
+  }
+]
