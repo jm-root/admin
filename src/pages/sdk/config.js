@@ -12,8 +12,6 @@ let config = {
 };
 
 const defaultConfig = {
-  title: 'Admin',
-  copyright: '2018',
   logLevel: 'debug',
   modules: {
     config: {},
