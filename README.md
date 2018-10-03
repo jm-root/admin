@@ -34,7 +34,19 @@ src/pages/simple/
 
 ```
 
-
+### src/defaultSettings
+```
++  title: 'Admin',
+```
+ 
+### src/components/SiderMenu/SiderMenu.js
+title
+### src/components/TopNavHeader/index.js
+title
+### src/layouts/BasicLayout
+title
+### src/layouts/Footer
+links
 ## 应用
 
 - sdk
