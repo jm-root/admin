@@ -4,6 +4,7 @@ import umiRouter from 'umi/router';
 import config from './config';
 import user from './plugins/user';
 import acl from './plugins/acl';
+import onError from './onError';
 
 const ms = new MS();
 const sdk = new Sdk(config);
@@ -23,12 +24,5 @@ sdk.login = function() {
   return null;
 };
 
-sdk.on('error', (e, opts) => {
-  logger.debug('request:', opts);
-  logger.error(e);
-  if (e.data && e.data.err === 401) {
-    umiRouter.push('/user/login');
-  }
-  return null;
-});
+onError(sdk);
 export default sdk;
