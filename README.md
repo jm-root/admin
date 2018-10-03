@@ -33,6 +33,8 @@ src/pages/simple/
 +    "jm-sdk": "^2.1.4",
 
 ```
+### config/config.js
+proxy
 
 ### src/defaultSettings
 ```
@@ -47,11 +49,17 @@ title
 title
 ### src/layouts/Footer
 links
+### src/models/login.js
+
+### src/services/user.js
+
+### src/services/sdk
+
+### src/services/api
+
+依赖 sdk
+
 ## 应用
-
-- sdk
-
-sdk
 
 - config
 

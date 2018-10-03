@@ -104,4 +104,31 @@ export default {
   cssnano: {
     mergeRules: false,
   },
+  proxy: {
+    '/api/config': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/sso': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/passport': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/acl': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/user': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+  },
 };

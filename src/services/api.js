@@ -1,5 +1,6 @@
 import { stringify } from 'qs';
 import request from '@/utils/request';
+import sdk from './sdk';
 
 export async function queryProjectNotice() {
   return request('/api/project/notice');
@@ -104,10 +105,19 @@ export async function updateFakeList(params) {
 }
 
 export async function fakeAccountLogin(params) {
-  return request('/api/login/account', {
-    method: 'POST',
-    body: params,
-  });
+  const { userName, password, type } = params;
+  const { acl, passport, storage, store } = sdk;
+  let doc = await passport.login(userName, password);
+  storage.setJson('sso', doc);
+  store.sso = doc;
+  const { id } = doc;
+  doc = await acl.getUserRoles(id);
+  const roles = ['user', ...Object.keys(doc)];
+  return {
+    status: 'ok',
+    type,
+    currentAuthority: roles,
+  };
 }
 
 export async function fakeRegister(params) {
@@ -115,6 +125,12 @@ export async function fakeRegister(params) {
     method: 'POST',
     body: params,
   });
+}
+
+export async function fakeLogout() {
+  const { store } = sdk;
+  sdk.logout();
+  store.user = null;
 }
 
 export async function queryNotices() {
