@@ -42,6 +42,7 @@ function formatter(data, parentPath = '', parentAuthority, parentName) {
       result.children = children;
     }
     delete result.routes;
+    if (!result.order) result.order = 0;
     return result;
   });
 }
@@ -136,7 +137,9 @@ class BasicLayout extends React.PureComponent {
     const {
       route: { routes },
     } = this.props;
-    return formatter(routes);
+    let doc = formatter(routes);
+    doc = doc.sort((a, b) => a.order > b.order);
+    return doc;
   }
 
   /**
