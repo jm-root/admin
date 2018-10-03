@@ -1,4 +1,4 @@
-import sdk from '@/pages/sdk';
+import sdk from '@/services/sdk';
 
 const { config } = sdk;
 
