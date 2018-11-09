@@ -34,7 +34,8 @@ src/pages/simple/
 
 ```
 ### config/config.js
-proxy
+
+增加 proxy 配置
 
 ### src/defaultSettings
 ```
@@ -43,12 +44,16 @@ proxy
  
 ### src/components/SiderMenu/SiderMenu.js
 title
+
 ### src/components/TopNavHeader/index.js
 title
+
 ### src/layouts/BasicLayout
 title
+
 ### src/layouts/Footer
 links
+
 ### src/models/login.js
 
 ### src/services/user.js

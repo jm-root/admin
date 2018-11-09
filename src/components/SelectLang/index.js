@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { FormattedMessage, setLocale, getLocale } from 'umi/locale';
+import { formatMessage, setLocale, getLocale } from 'umi/locale';
 import { Menu, Icon, Dropdown } from 'antd';
 import classNames from 'classnames';
 import styles from './index.less';
@@ -11,18 +11,42 @@ export default class SelectLang extends PureComponent {
 
   render() {
     const { className } = this.props;
+    const selectedLang = getLocale();
     const langMenu = (
-      <Menu className={styles.menu} selectedKeys={[getLocale()]} onClick={this.changLang}>
-        <Menu.Item key="zh-CN">中文</Menu.Item>
-        <Menu.Item key="en-US">English</Menu.Item>
-        <Menu.Item key="pt-BR">Português</Menu.Item>
+      <Menu className={styles.menu} selectedKeys={[selectedLang]} onClick={this.changLang}>
+        <Menu.Item key="zh-CN">
+          <span role="img" aria-label="简体中文">
+            🇨🇳
+          </span>{' '}
+          简体中文
+        </Menu.Item>
+        <Menu.Item key="zh-TW">
+          <span role="img" aria-label="繁体中文">
+            🇭🇰
+          </span>{' '}
+          繁体中文
+        </Menu.Item>
+        <Menu.Item key="en-US">
+          <span role="img" aria-label="English">
+            🇬🇧
+          </span>{' '}
+          English
+        </Menu.Item>
+        <Menu.Item key="pt-BR">
+          <span role="img" aria-label="Português">
+            🇵🇹
+          </span>{' '}
+          Português
+        </Menu.Item>
       </Menu>
     );
     return (
-      <Dropdown overlay={langMenu}>
-        <span className={classNames(styles.dropdown, className)}>
-          <FormattedMessage id="navbar.lang" /> <Icon type="down" />
-        </span>
+      <Dropdown overlay={langMenu} placement="bottomRight">
+        <Icon
+          type="global"
+          className={classNames(styles.dropDown, className)}
+          title={formatMessage({ id: 'navBar.lang' })}
+        />
       </Dropdown>
     );
   }

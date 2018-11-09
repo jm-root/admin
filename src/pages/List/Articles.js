@@ -1,10 +1,10 @@
 import React, { Component, Fragment } from 'react';
-import moment from 'moment';
 import { connect } from 'dva';
-import { Form, Card, Select, List, Tag, Icon, Avatar, Row, Col, Button } from 'antd';
+import { Form, Card, Select, List, Tag, Icon, Row, Col, Button } from 'antd';
 
 import TagSelect from '@/components/TagSelect';
 import StandardFormRow from '@/components/StandardFormRow';
+import ArticleListContent from '@/components/ArticleListContent';
 import styles from './Articles.less';
 
 const { Option } = Select;
@@ -94,18 +94,6 @@ class SearchList extends Component {
         <Icon type={type} style={{ marginRight: 8 }} />
         {text}
       </span>
-    );
-
-    const ListContent = ({ data: { content, updatedAt, avatar, owner, href } }) => (
-      <div className={styles.listContent}>
-        <div className={styles.description}>{content}</div>
-        <div className={styles.extra}>
-          <Avatar src={avatar} size="small" />
-          <a href={href}>{owner}</a> 发布在
-          <a href={href}>{href}</a>
-          <em>{moment(updatedAt).format('YYYY-MM-DD HH:mm')}</em>
-        </div>
-      </div>
     );
 
     const formItemLayout = {
@@ -241,7 +229,7 @@ class SearchList extends Component {
                     </span>
                   }
                 />
-                <ListContent data={item} />
+                <ArticleListContent data={item} />
               </List.Item>
             )}
           />
