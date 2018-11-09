@@ -21,7 +21,7 @@ class Loader {
     this.mergeLocales();
   }
 
-  // 加载 app, 合并 routes
+  // 鍔犺浇 app, 鍚堝苟 routes
   loadApp(filePath) {
     const { dir } = this;
     const file = path.join(dir, filePath, '/routes.json');
@@ -31,7 +31,7 @@ class Loader {
     this.copyMocks(filePath);
   }
 
-  // 合并 locales
+  // 鍚堝苟 locales
   loadLocales(filePath) {
     const { dir, locales } = this;
     const localePath = path.join(dir, filePath, '/locales');
@@ -47,7 +47,7 @@ class Loader {
       });
   }
 
-  // 复制 mock
+  // 澶嶅埗 mock
   copyMocks(filePath) {
     const { dir } = this;
     const mockPath = path.join(dir, filePath, '/mock');
@@ -55,7 +55,7 @@ class Loader {
     fse.copySync(mockPath, path.join(__dirname, '../mock'));
   }
 
-  // 合并来自 app 的locales，并更新 src/locales
+  // 鍚堝苟鏉ヨ嚜 app 鐨刲ocales锛屽苟鏇存柊 src/locales
   mergeLocales() {
     const { locales } = this;
     Object.keys(locales).forEach(key => {
