@@ -123,5 +123,15 @@ export default {
       changeOrigin: true,
       pathRewrite: { '^/api': '' },
     },
+    '/api/log': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/wordfilter': {
+      target: 'http://api.test.jamma.cn',
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
   },
 };
