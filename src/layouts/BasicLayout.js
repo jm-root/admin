@@ -47,6 +47,7 @@ function formatter(data, parentAuthority, parentName) {
         result.children = children;
       }
       delete result.routes;
+      if (!result.order) result.order = 0;
       return result;
     })
     .filter(item => item);
@@ -145,7 +146,10 @@ class BasicLayout extends React.PureComponent {
     const {
       route: { routes },
     } = this.props;
-    return memoizeOneFormatter(routes);
+    // return memoizeOneFormatter(routes);
+    let doc = memoizeOneFormatter(routes);
+    doc = doc.sort((a, b) => a.order > b.order);
+    return doc;
   }
 
   /**
