@@ -1,9 +1,0 @@
-[
-  {
-    "path": "/config",
-    "name": "config",
-    "icon": "setting",
-    "order": 10000,
-    "component": "./config/index"
-  }
-]

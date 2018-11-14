@@ -290,4 +290,9 @@ export default {
   'app.setting.copyinfo': 'copy success，please replace defaultSettings in src/models/setting.js',
   'app.setting.production.hint':
     'Setting panel shows in development environment only, please manually modify',
+  'menu.config': 'Config',
+  'menu.wordFilter': 'WordFilter',
+  'menu.wordfilter': 'WordFilter',
+  'menu.log': 'Log',
+  'menu.logLogin': 'LogLogin',
 };

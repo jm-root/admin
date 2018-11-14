@@ -7,7 +7,7 @@ let config = {
     api: 'https://api.test.jamma.cn',
   },
   production: {
-    api: 'https://api.jamma.cn',
+    api: 'https://api.test.jamma.cn',
   },
 };
 
