@@ -14,7 +14,7 @@ RUN apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 lib
   libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
   ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
 
-CMD ["npm", "run", "build"]
+RUN npm run build
 
 FROM nginx:alpine
 COPY --from=build-deps /usr/src/app/dist /usr/share/nginx/html
