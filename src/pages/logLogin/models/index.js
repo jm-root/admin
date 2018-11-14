@@ -61,7 +61,7 @@ const list = [
     gender: '男',
     crtime: new Date('2018-10-15 17:19:55'),
     ip: '116.21.13.73',
-    email: 'jeff@jamma.cn',
+    email: 'root@jamma.cn',
   },
   {
     account: 'cici',
@@ -86,6 +86,14 @@ const list = [
     crtime: new Date('2018-10-25 12:16:59'),
     ip: '116.21.13.73',
     email: 'jeff@jamma.cn',
+  },
+  {
+    account: 'root',
+    name: '管理员',
+    gender: '男',
+    crtime: new Date(),
+    ip: '116.21.13.73',
+    email: 'root@jamma.cn',
   },
 ];
 
