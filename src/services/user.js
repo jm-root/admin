@@ -14,6 +14,7 @@ export async function queryCurrent() {
       store.user = await user.getUserInfo(id);
     }
   }
+  const currentUser = store.user || {};
   const doc = {
     avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
     userid: '00000001',
@@ -61,8 +62,8 @@ export async function queryCurrent() {
     },
     address: '西湖区工专路 77 号',
     phone: '0752-268888888',
-    ...store.user,
-    name: store.user.nick || store.user.account,
+    ...currentUser,
+    name: currentUser.nick || currentUser.account,
   };
   return doc;
 }
