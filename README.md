@@ -48,6 +48,9 @@ title
 ### src/components/TopNavHeader/index.js
 title
 
+### src/components/GlobalHeader/RightContent.js
+- menu triggerError
+
 ### src/layouts/BasicLayout
 title
 
