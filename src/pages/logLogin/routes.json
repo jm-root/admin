@@ -1,0 +1,9 @@
+[
+  {
+    "path": "/logLogin",
+    "name": "logLogin",
+    "icon": "setting",
+    "order": 9000,
+    "component": "./logLogin/index"
+  }
+]
