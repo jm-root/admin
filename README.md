@@ -56,6 +56,8 @@ title
 ### src/layouts/Footer
 links
 
+### src/public/favicon.png
+
 ### src/models/login.js
 
 ### src/services/user.js
@@ -65,6 +67,9 @@ links
 ### src/services/api
 
 依赖 sdk
+
+### src/pages/document.ejs
+- title
 
 ### src/pages/User/Login.js
 
