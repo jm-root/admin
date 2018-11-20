@@ -137,13 +137,18 @@ class TableList extends PureComponent {
       loading,
     } = this.props;
     const { selectedRows } = this.state;
-
+    const paginationProps = { pageSize: 20 };
     return (
       <PageHeaderWrapper title="用户登入日志">
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
-            <Table dataSource={data.list} columns={this.columns} rowKey={record => record.index} />
+            <Table
+              dataSource={data.list}
+              columns={this.columns}
+              rowKey={record => record.index}
+              pagination={paginationProps}
+            />
           </div>
         </Card>
       </PageHeaderWrapper>
