@@ -137,7 +137,7 @@ class TableList extends PureComponent {
       loading,
     } = this.props;
     const { selectedRows } = this.state;
-    const paginationProps = { pageSize: 20 };
+    const paginationProps = { pageSize: 10 };
     return (
       <PageHeaderWrapper title="用户登入日志">
         <Card bordered={false}>

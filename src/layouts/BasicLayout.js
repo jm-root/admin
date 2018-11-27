@@ -148,7 +148,7 @@ class BasicLayout extends React.PureComponent {
     } = this.props;
     // return memoizeOneFormatter(routes);
     let doc = memoizeOneFormatter(routes);
-    doc = doc.sort((a, b) => a.order > b.order);
+    doc = doc.sort((a, b) => a.order - b.order);
     return doc;
   }
 
