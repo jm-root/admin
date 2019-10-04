@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/acl",
+    "name": "acl",
+    "icon": "safety",
+    "order": 100,
+    "hideInMenu": false,
+    "routes": [
+      {
+        "path": "/acl/users",
+        "component": "./acl/routes/users",
+        "name": "users"
+      },
+      {
+        "path": "/acl/users/create",
+        "component": "./acl/routes/userCreate",
+        "name": "users.create",
+        "hideInMenu": true
+      },
+      {
+        "path": "/acl/users/info",
+        "component": "./acl/routes/userInfo",
+        "name": "users.info",
+        "hideInMenu": true
+      },
+      {
+        "path": "/acl/roles",
+        "component": "./acl/routes/roles",
+        "name": "roles"
+      },
+      {
+        "path": "/acl/resources",
+        "component": "./acl/routes/resources",
+        "name": "resources"
+      }
+    ]
+  }
+]
