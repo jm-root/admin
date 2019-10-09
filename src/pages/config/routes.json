@@ -4,6 +4,7 @@
     "name": "config",
     "icon": "setting",
     "order": 10000,
-    "component": "./config/index"
+    "component": "./config/index",
+    "authority": ["root"]
   }
 ]
