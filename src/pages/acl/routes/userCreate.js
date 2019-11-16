@@ -272,10 +272,7 @@ class UserCreate extends PureComponent {
                   onChange={value => this.handleInputChange(value, 'nick')}
                 />
               )}
-              <span style={{ position: 'absolute', right: 10 }}>
-                {strLength['nick'] || 0}
-                /50
-              </span>
+              <span style={{ position: 'absolute', right: 10 }}>{strLength['nick'] || 0}/50</span>
             </FormItem>
             <FormItem {...formItemLayout} label="标签">
               {getFieldDecorator('tags', {

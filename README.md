@@ -9,14 +9,13 @@
 ### 删除
 
 ```
-.circleci/
 functions/
-scripts/
 .firebaserc
 CODE_OF_CONDUCT.md
 firebase.json
 README.ru-RU.md
 README.zh-CN.md
+README.tr-TR.md
 src/pages/simple/
 
 ```
@@ -50,9 +49,6 @@ title
 
 ### src/components/GlobalHeader/RightContent.js
 - menu triggerError
-
-### src/layouts/BasicLayout
-title
 
 ### src/layouts/UserLayout
 

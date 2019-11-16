@@ -306,22 +306,21 @@ class Resources extends PureComponent {
                     })(<Checkbox />)}
                   </FormItem>
 
-                  {!isDefault &&
-                    (isNew || targetResource._id !== undefined) && (
-                      <FormItem
-                        wrapperCol={{ xs: { span: 14, offset: 8 }, sm: { span: 14, offset: 8 } }}
-                        style={{ marginTop: 25 }}
-                      >
-                        <Button type="primary" htmlType="submit">
-                          {isNew ? '创建' : '更新'}
+                  {!isDefault && (isNew || targetResource._id !== undefined) && (
+                    <FormItem
+                      wrapperCol={{ xs: { span: 14, offset: 8 }, sm: { span: 14, offset: 8 } }}
+                      style={{ marginTop: 25 }}
+                    >
+                      <Button type="primary" htmlType="submit">
+                        {isNew ? '创建' : '更新'}
+                      </Button>
+                      {!isNew && (
+                        <Button onClick={() => this.handleDelete()} style={{ marginLeft: 8 }}>
+                          删除
                         </Button>
-                        {!isNew && (
-                          <Button onClick={() => this.handleDelete()} style={{ marginLeft: 8 }}>
-                            删除
-                          </Button>
-                        )}
-                      </FormItem>
-                    )}
+                      )}
+                    </FormItem>
+                  )}
                 </Form>
               </Card>
             </Col>

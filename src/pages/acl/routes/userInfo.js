@@ -205,8 +205,7 @@ class UserInfo extends PureComponent {
                     />
                   )}
                   <span style={{ position: 'absolute', right: 10 }}>
-                    {strLength['nick'] || 0}
-                    /50
+                    {strLength['nick'] || 0}/50
                     <span style={{ position: 'absolute', width: '150px', marginLeft: 20 }}>
                       <Button
                         type="primary"

@@ -1,9 +1,0 @@
-[
-  {
-    "path": "/wordfilter",
-    "name": "wordfilter",
-    "icon": "setting",
-    "order": 9000,
-    "component": "./wordfilter/index"
-  }
-]

@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import { formatMessage } from 'umi/locale';
+import React, { Component } from 'react';
+import { formatMessage } from 'umi-plugin-react/locale';
 import { Layout, message } from 'antd';
 import Animate from 'rc-animate';
 import { connect } from 'dva';
@@ -7,11 +7,10 @@ import router from 'umi/router';
 import GlobalHeader from '@/components/GlobalHeader';
 import TopNavHeader from '@/components/TopNavHeader';
 import styles from './Header.less';
-import Authorized from '@/utils/Authorized';
 
 const { Header } = Layout;
 
-class HeaderView extends PureComponent {
+class HeaderView extends Component {
   state = {
     visible: true,
   };
@@ -99,13 +98,11 @@ class HeaderView extends PureComponent {
           this.setState({
             visible: true,
           });
-        }
-        if (scrollTop > 300 && visible) {
+        } else if (scrollTop > 300 && visible) {
           this.setState({
             visible: false,
           });
-        }
-        if (scrollTop < 300 && !visible) {
+        } else if (scrollTop < 300 && !visible) {
           this.setState({
             visible: true,
           });
@@ -128,7 +125,6 @@ class HeaderView extends PureComponent {
           <TopNavHeader
             theme={navTheme}
             mode="horizontal"
-            Authorized={Authorized}
             onCollapse={handleMenuCollapse}
             onNoticeClear={this.handleNoticeClear}
             onMenuClick={this.handleMenuClick}
@@ -157,6 +153,7 @@ class HeaderView extends PureComponent {
 export default connect(({ user, global, setting, loading }) => ({
   currentUser: user.currentUser,
   collapsed: global.collapsed,
+  fetchingMoreNotices: loading.effects['global/fetchMoreNotices'],
   fetchingNotices: loading.effects['global/fetchNotices'],
   notices: global.notices,
   setting,

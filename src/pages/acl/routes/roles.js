@@ -285,21 +285,20 @@ class Roles extends PureComponent {
             {isCollapsed ? '新增' : '取消'}
           </Button>
         )}
-        {itemIndex !== -1 &&
-          editStatus !== 1 && (
-            <Button
-              size="small"
-              style={{
-                marginLeft: 3,
-                color: '#fff',
-                backgroundColor: '#27c24c',
-                borderColor: '#27c24c',
-              }}
-              onClick={() => this.handleUpdate()}
-            >
-              {isCollapsed ? '编辑' : '取消'}
-            </Button>
-          )}
+        {itemIndex !== -1 && editStatus !== 1 && (
+          <Button
+            size="small"
+            style={{
+              marginLeft: 3,
+              color: '#fff',
+              backgroundColor: '#27c24c',
+              borderColor: '#27c24c',
+            }}
+            onClick={() => this.handleUpdate()}
+          >
+            {isCollapsed ? '编辑' : '取消'}
+          </Button>
+        )}
       </span>
     );
 
@@ -519,17 +518,16 @@ class Roles extends PureComponent {
                                 this.handleItemClick(item, index);
                               }}
                             >
-                              {!userRoles[item.code] &&
-                                isCollapsed && (
-                                  <Icon
-                                    type="close"
-                                    key="Icon"
-                                    className={styles.hoverAction}
-                                    onClick={() => {
-                                      showConfirm(item);
-                                    }}
-                                  />
-                                )}
+                              {!userRoles[item.code] && isCollapsed && (
+                                <Icon
+                                  type="close"
+                                  key="Icon"
+                                  className={styles.hoverAction}
+                                  onClick={() => {
+                                    showConfirm(item);
+                                  }}
+                                />
+                              )}
                               {item.title}
                             </a>
                           </Tooltip>

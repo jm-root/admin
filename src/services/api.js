@@ -34,11 +34,11 @@ export async function addRule(params) {
   });
 }
 
-export async function updateRule(params) {
-  return request('/api/rule', {
+export async function updateRule(params = {}) {
+  return request(`/api/rule?${stringify(params.query)}`, {
     method: 'POST',
     body: {
-      ...params,
+      ...params.body,
       method: 'update',
     },
   });
@@ -59,8 +59,8 @@ export async function queryTags() {
   return request('/api/tags');
 }
 
-export async function queryBasicProfile() {
-  return request('/api/profile/basic');
+export async function queryBasicProfile(id) {
+  return request(`/api/profile/basic?id=${id}`);
 }
 
 export async function queryAdvancedProfile() {
@@ -120,6 +120,12 @@ export async function fakeAccountLogin(params) {
   };
 }
 
+export async function fakeLogout() {
+  const { store } = sdk;
+  sdk.logout();
+  store.user = null;
+}
+
 export async function fakeRegister(params) {
   return request('/api/register', {
     method: 'POST',
@@ -127,14 +133,8 @@ export async function fakeRegister(params) {
   });
 }
 
-export async function fakeLogout() {
-  const { store } = sdk;
-  sdk.logout();
-  store.user = null;
-}
-
-export async function queryNotices() {
-  return request('/api/notices');
+export async function queryNotices(params = {}) {
+  return request(`/api/notices?${stringify(params)}`);
 }
 
 export async function getFakeCaptcha(mobile) {

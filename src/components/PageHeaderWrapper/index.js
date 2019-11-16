@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormattedMessage } from 'umi/locale';
+import { FormattedMessage } from 'umi-plugin-react/locale';
 import Link from 'umi/link';
 import PageHeader from '@/components/PageHeader';
 import { connect } from 'dva';
@@ -21,9 +21,9 @@ const PageHeaderWrapper = ({ children, contentWidth, wrapperClassName, top, ...r
           linkElement={Link}
           itemRender={item => {
             if (item.locale) {
-              return <FormattedMessage id={item.locale} defaultMessage={item.name} />;
+              return <FormattedMessage id={item.locale} defaultMessage={item.title} />;
             }
-            return item.name;
+            return item.title;
           }}
         />
       )}

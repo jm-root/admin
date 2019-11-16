@@ -5,7 +5,6 @@
     "icon": "safety",
     "order": 100,
     "hideInMenu": false,
-    "authority": ["root"],
     "routes": [
       {
         "path": "/acl/users",
