@@ -16,13 +16,13 @@ import {
   Tooltip,
   Select,
 } from 'antd';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './index.less';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import classNames from 'classnames';
+import styles from './index.less';
 
 const FormItem = Form.Item;
-const confirm = Modal.confirm;
-const TreeNode = Tree.TreeNode;
+const { confirm } = Modal;
+const { TreeNode } = Tree;
 const { Option } = Select;
 
 @connect(({ acl, loading }) => ({
@@ -48,6 +48,7 @@ class Roles extends PureComponent {
     expandedKeys: [],
     autoExpandParent: true,
   };
+
   componentDidMount() {
     const { dispatch, match } = this.props;
     window.addEventListener('resize', this.resizeHeight);
@@ -58,9 +59,11 @@ class Roles extends PureComponent {
       callback: doc => {},
     });
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeHeight);
   }
+
   resizeHeight = () => {
     this.setState({ height: `${document.body.clientHeight - 360}px` });
   };
@@ -71,7 +74,7 @@ class Roles extends PureComponent {
       type: 'acl/queryAclUserPerRoles',
       payload: {},
       callback: roles => {
-        let options = [];
+        const options = [];
         roles.forEach(role => {
           options.push(<Option key={role.code}>{role.title}</Option>);
         });
@@ -107,7 +110,7 @@ class Roles extends PureComponent {
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         let type = 'acl/addAclRole';
-        let update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
+        const update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
         if (editStatus === 2) {
           values._id = targetRole._id;
           type = 'acl/updateAclRole';
@@ -116,7 +119,7 @@ class Roles extends PureComponent {
         values.status === true ? (values.status = 1) : (values.status = 0);
 
         dispatch({
-          type: type,
+          type,
           payload: values,
           callback: doc => {
             console.log(doc);
@@ -127,9 +130,11 @@ class Roles extends PureComponent {
       }
     });
   };
+
   handleCancel = () => {
     this.setState({ isCollapsed: true, editStatus: -1 });
   };
+
   handleAdd = () => {
     let { isCollapsed } = this.state;
     isCollapsed = !isCollapsed;
@@ -137,6 +142,7 @@ class Roles extends PureComponent {
     isCollapsed ? (editStatus = -1) : (editStatus = 1);
     this.setState({ isCollapsed, editStatus });
   };
+
   handleUpdate = () => {
     let { isCollapsed } = this.state;
     isCollapsed = !isCollapsed;
@@ -144,11 +150,12 @@ class Roles extends PureComponent {
     isCollapsed ? (editStatus = -1) : (editStatus = 2);
     this.setState({ isCollapsed, editStatus });
   };
+
   changePermisssion = (e, item, type) => {
     let { addPermission, removePermission, resourcePer, itemIndex } = this.state;
     if (itemIndex === -1) return;
-    const checked = e.target.checked;
-    const code = item.code;
+    const { checked } = e.target;
+    const { code } = item;
     resourcePer[code] || (resourcePer[code] = []);
     addPermission[code] || (addPermission[code] = []);
     removePermission[code] || (removePermission[code] = []);
@@ -156,11 +163,9 @@ class Roles extends PureComponent {
       if (!removePermission[code] || removePermission[code].indexOf(type) === -1) {
         if (!addPermission[code]) {
           addPermission[code] = [type];
-        } else {
-          if (addPermission[code].indexOf(type) === -1) {
+        } else if (addPermission[code].indexOf(type) === -1) {
             addPermission[code].push(type);
           }
-        }
       } else {
         removePermission[code].splice(removePermission[code].indexOf(type), 1);
       }
@@ -169,11 +174,9 @@ class Roles extends PureComponent {
       if (!addPermission[code] || addPermission[code].indexOf(type) === -1) {
         if (!removePermission[code]) {
           removePermission[code] = [type];
-        } else {
-          if (removePermission[code].indexOf(type) === -1) {
+        } else if (removePermission[code].indexOf(type) === -1) {
             removePermission[code].push(type);
           }
-        }
       } else {
         addPermission[code].splice(addPermission[code].indexOf(type), 1);
       }
@@ -184,14 +187,15 @@ class Roles extends PureComponent {
     resourcePer = Object.assign({}, resourcePer);
     this.setState({ resourcePer, addPermission, removePermission });
   };
+
   handleSave = () => {
     const { acl: model, dispatch } = this.props;
     let { addPermission, removePermission, targetRole } = this.state;
     function formatPermission(ary) {
-      let allow = [];
-      for (let key in ary) {
+      const allow = [];
+      for (const key in ary) {
         if (ary.hasOwnProperty(key) && ary[key].length) {
-          let per = {
+          const per = {
             permissions: ary[key],
             resources: key,
           };
@@ -219,8 +223,8 @@ class Roles extends PureComponent {
   handleDelete = item => {
     const self = this;
     const { dispatch } = this.props;
-    let { targetRole } = this.state;
-    let update = { itemIndex: -1 };
+    const { targetRole } = this.state;
+    const update = { itemIndex: -1 };
     if (targetRole._id === item._id) {
       update.targetRole = {};
     }
@@ -308,12 +312,12 @@ class Roles extends PureComponent {
           <Row type="flex" justify="start">
             <Col md={10} sm={24}>
               <FormItem label="角色">
-                <Input size="small" value={targetRole.title || '角色'} disabled={true} />
+                <Input size="small" value={targetRole.title || '角色'} disabled />
               </FormItem>
             </Col>
             <Col md={10} sm={24}>
               <FormItem label="描述">
-                <Input size="small" value={targetRole.description || '描述'} disabled={true} />
+                <Input size="small" value={targetRole.description || '描述'} disabled />
               </FormItem>
             </Col>
           </Row>
@@ -334,7 +338,7 @@ class Roles extends PureComponent {
       </span>
     );
 
-    let self = this;
+    const self = this;
     function showConfirm(item) {
       confirm({
         title: '提示',
@@ -441,7 +445,7 @@ class Roles extends PureComponent {
                       })(
                         <Select mode="multiple" placeholder="上级角色">
                           {roleOptions}
-                        </Select>
+                        </Select>,
                       )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="编码">
@@ -480,13 +484,13 @@ class Roles extends PureComponent {
                     <FormItem {...formItemLayout} label="开/关">
                       {getFieldDecorator('status', {
                         rules: [],
-                        initialValue: curRole.status === 1 ? true : false,
+                        initialValue: curRole.status === 1,
                       })(
                         <Switch
                           checkedChildren="开"
                           unCheckedChildren="关"
-                          defaultChecked={curRole.status === 1 ? true : false}
-                        />
+                          defaultChecked={curRole.status === 1}
+                        />,
                       )}
                     </FormItem>
                     <FormItem
@@ -506,8 +510,7 @@ class Roles extends PureComponent {
                 <div className={styles.scrollYHidden} style={{ height: this.state.height }}>
                   <div style={{ height: this.state.height }}>
                     <div className={styles.listGroup}>
-                      {perRoles.map((item, index) => {
-                        return (
+                      {perRoles.map((item, index) => (
                           <Tooltip title={`${item.code}:${item.description}`} key={item._id}>
                             <a
                               className={classNames(styles.listGroupItem, {
@@ -531,8 +534,7 @@ class Roles extends PureComponent {
                               {item.title}
                             </a>
                           </Tooltip>
-                        );
-                      })}
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -553,16 +555,16 @@ class Roles extends PureComponent {
                   <span className={styles.listGroupItem} onClick={() => {}}>
                     资源
                     <div className={styles.pullRight}>
-                      <Tooltip title={`POST`}>
+                      <Tooltip title="POST">
                         <span style={{ marginRight: 30 }}>新增</span>
                       </Tooltip>
-                      <Tooltip title={`PUT`}>
+                      <Tooltip title="PUT">
                         <span style={{ marginRight: 30 }}>修改</span>
                       </Tooltip>
-                      <Tooltip title={`DELETE`}>
+                      <Tooltip title="DELETE">
                         <span style={{ marginRight: 30 }}>删除</span>
                       </Tooltip>
-                      <Tooltip title={`GET`}>
+                      <Tooltip title="GET">
                         <span>查询</span>
                       </Tooltip>
                     </div>

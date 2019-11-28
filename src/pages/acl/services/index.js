@@ -1,8 +1,8 @@
+import { stringify } from 'qs';
 import sdk from '@/services/sdk';
 
-const { acl } = sdk;
 
-import { stringify } from 'qs';
+const { acl } = sdk;
 
 function getSSO() {
   return sdk.store.sso;
@@ -19,11 +19,11 @@ export async function queryAclUserInfo(params) {
 export async function addAclUser(params = {}) {
   const tokenData = getSSO();
   params.creator = tokenData.id;
-  return acl.post(`/users`, params);
+  return acl.post('/users', params);
 }
 
 export async function updateAclUserInfo(params) {
-  let id = params.id;
+  const { id } = params;
   params.id && delete params.id;
   params._id = id;
   return acl.post(`/users/${id}`, params);
@@ -35,7 +35,7 @@ export async function removeAclUser(params) {
 
 // 查询所有角色
 export async function queryAclRoles(params) {
-  return acl.get(`/roles`);
+  return acl.get('/roles');
 }
 
 export async function queryUsers(params) {
@@ -45,14 +45,14 @@ export async function queryUsers(params) {
 // 查询用户角色
 export async function queryAclUserRoles(params) {
   const tokenData = getSSO();
-  const id = tokenData.id;
+  const { id } = tokenData;
   return acl.get(`/users/${id}/roles`);
 }
 
 // 查询用户资源
 export async function queryAclUserResources(params) {
   const tokenData = getSSO();
-  const id = tokenData.id;
+  const { id } = tokenData;
   return acl.get(`/users/${id}/resources`);
 }
 
@@ -60,7 +60,7 @@ export async function queryAclUserResources(params) {
 export async function addAclRole(params) {
   const tokenData = getSSO();
   params.creator = tokenData.id;
-  return acl.post(`/roles`, params);
+  return acl.post('/roles', params);
 }
 
 // 删除角色
@@ -75,25 +75,25 @@ export async function updateAclRole(params) {
 
 // 更新角色资源
 export async function updateAclRoleResource(params) {
-  let id = params.id;
+  const { id } = params;
   delete params.id;
   return acl.post(`/roles/${id}/resource`, params);
 }
 
 // 查询角色资源权限
 export async function queryAclRoleResources(params) {
-  let id = params.id;
+  const { id } = params;
   return acl.get(`/roles/${id}/resources?${stringify(params)}`);
 }
 
 // 查询所有资源树
 export async function queryAclResourceTree(params) {
-  return acl.get(`/resources/tree`);
+  return acl.get('/resources/tree');
 }
 
 // 新增资源
 export async function addAclResource(params) {
-  return acl.post(`/resources`, params);
+  return acl.post('/resources', params);
 }
 
 // 更新资源

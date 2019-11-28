@@ -5,9 +5,9 @@ import classNames from 'classnames'
 import styles from './index.less'
 
 const FormItem = Form.Item
-const {confirm} = Modal
+const { confirm } = Modal
 
-@connect(({config, loading}) => ({
+@connect(({ config, loading }) => ({
   config,
   loading: loading.effects['config/fetchConfigRoots'],
 }))
@@ -24,8 +24,8 @@ class Home extends PureComponent {
   }
 
   componentDidMount () {
-    const {resizeHeight} = this
-    const {dispatch} = this.props
+    const { resizeHeight } = this
+    const { dispatch } = this.props
     window.addEventListener('resize', resizeHeight)
     dispatch({
       type: 'config/fetchConfigRoots',
@@ -37,43 +37,43 @@ class Home extends PureComponent {
   }
 
   resizeHeight = () => {
-    this.setState({height: `${document.body.clientHeight - 328}px`})
+    this.setState({ height: `${document.body.clientHeight - 328}px` })
   }
 
   handleItemClick = (item, index) => {
-    const {config: model, dispatch} = this.props
-    const {hkeys} = model
+    const { config: model, dispatch } = this.props
+    const { hkeys } = model
     const hkey = hkeys[index]
-    const {isGlobalEdit} = this.state
+    const { isGlobalEdit } = this.state
     dispatch({
       type: 'config/clearValue',
     })
     dispatch({
       type: 'config/fetchConfigHKey',
-      payload: {isGlobal: isGlobalEdit, hkey},
+      payload: { isGlobal: isGlobalEdit, hkey },
     })
-    this.setState({itemIndex: index, keyIndex: -1})
+    this.setState({ itemIndex: index, keyIndex: -1 })
   }
 
   handleKeyClick = (item, index) => {
-    const {dispatch} = this.props
-    this.setState({keyIndex: index})
+    const { dispatch } = this.props
+    this.setState({ keyIndex: index })
     dispatch({
       type: 'config/fetchConfigValue',
-      payload: {isGlobal: this.state.isGlobalEdit, index},
+      payload: { isGlobal: this.state.isGlobalEdit, index },
     })
   }
 
   handleSearchChange = e => {
-    this.setState({search: e.target.value})
+    this.setState({ search: e.target.value })
   }
 
   handleInputKeyChange = e => {
-    this.setState({key: e.target.value})
+    this.setState({ key: e.target.value })
   }
 
   handleSubmit = e => {
-    const {form} = this.props
+    const { form } = this.props
     e.preventDefault()
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
@@ -83,36 +83,36 @@ class Home extends PureComponent {
   }
 
   handleCollapsed = () => {
-    const {isCollapsed} = this.state
-    this.setState({isCollapsed: !isCollapsed})
+    const { isCollapsed } = this.state
+    this.setState({ isCollapsed: !isCollapsed })
   }
 
   handleGlobalEdit = () => {
-    const {dispatch} = this.props
-    let {isGlobalEdit} = this.state
+    const { dispatch } = this.props
+    let { isGlobalEdit } = this.state
     isGlobalEdit = !isGlobalEdit
-    let state = {isGlobalEdit}
+    let state = { isGlobalEdit }
     dispatch({
       type: 'config/clearValue',
     })
     if (isGlobalEdit) {
       dispatch({
         type: 'config/fetchConfigValue',
-        payload: {isGlobal: isGlobalEdit, index: this.state.itemIndex},
+        payload: { isGlobal: isGlobalEdit, index: this.state.itemIndex },
       })
     } else {
-      state = {...state, itemIndex: -1, keyIndex: -1}
+      state = { ...state, itemIndex: -1, keyIndex: -1 }
     }
 
     this.setState(state)
   }
 
   handleSave = () => {
-    const {config: model, dispatch} = this.props
-    const {hkeys, keys, value} = model
+    const { config: model, dispatch } = this.props
+    const { hkeys, keys, value } = model
     const root = hkeys[this.state.itemIndex]
     const key = keys[this.state.keyIndex]
-    const payload = this.state.isGlobalEdit ? {root, value} : {root, key, value}
+    const payload = this.state.isGlobalEdit ? { root, value } : { root, key, value }
     dispatch({
       type: 'config/saveConfigValue',
       payload,
@@ -120,7 +120,7 @@ class Home extends PureComponent {
   }
 
   handleTextareaChange = e => {
-    const {dispatch} = this.props
+    const { dispatch } = this.props
     dispatch({
       type: 'config/changeValue',
       payload: e.target.value,
@@ -128,7 +128,7 @@ class Home extends PureComponent {
   }
 
   handleAddHKey = payload => {
-    const {dispatch} = this.props
+    const { dispatch } = this.props
     dispatch({
       type: 'config/addConfigHKey',
       payload,
@@ -138,19 +138,19 @@ class Home extends PureComponent {
 
   handleAddKey = () => {
     if (!this.state.key) return message.error('输入配置键')
-    const {config: model, dispatch} = this.props
-    const {hkeys} = model
+    const { config: model, dispatch } = this.props
+    const { hkeys } = model
     const root = hkeys[this.state.itemIndex]
     dispatch({
       type: 'config/addConfigKey',
-      payload: {root, key: this.state.key},
+      payload: { root, key: this.state.key },
     })
   }
 
   handleDeleteConfig = (key, index) => {
     if (!key && index === -1) return message.error('请选择要清空的内容')
-    const {config: model, dispatch} = this.props
-    const {hkeys} = model
+    const { config: model, dispatch } = this.props
+    const { hkeys } = model
     const root = hkeys[index || this.state.itemIndex]
     if (!key) {
       dispatch({
@@ -159,26 +159,26 @@ class Home extends PureComponent {
     }
     dispatch({
       type: 'config/deleteConfig',
-      payload: {root, key},
+      payload: { root, key },
     })
-    this.setState(key ? {keyIndex: -1} : {itemIndex: -1})
+    this.setState(key ? { keyIndex: -1 } : { itemIndex: -1 })
   }
 
   render () {
     const height = `calc(${this.state.height} - 20px)`
-    const {getFieldDecorator} = this.props.form
-    const {loading, config: model} = this.props
-    const {hkItems, keys, value} = model
+    const { getFieldDecorator } = this.props.form
+    const { loading, config: model } = this.props
+    const { hkItems, keys, value } = model
 
     const formItemLayout = {
       labelCol: {
-        xs: {span: 24},
-        sm: {span: 7},
+        xs: { span: 24 },
+        sm: { span: 7 },
       },
       wrapperCol: {
-        xs: {span: 24},
-        sm: {span: 14},
-        md: {span: 14},
+        xs: { span: 24 },
+        sm: { span: 14 },
+        md: { span: 14 },
       },
     }
 
@@ -192,13 +192,13 @@ class Home extends PureComponent {
             size="small"
             prefix={<Icon type="search" key="Icon" />}
             maxLength="25"
-            style={{width: '150px'}}
+            style={{ width: '150px' }}
           />
         </span>
         <Button
           type={this.state.isCollapsed ? 'primary' : 'default'}
           size="small"
-          style={{marginLeft: 4}}
+          style={{ marginLeft: 4 }}
           onClick={() => this.handleCollapsed()}
         >
           {this.state.isCollapsed ? '新增' : '取消'}
@@ -226,13 +226,13 @@ class Home extends PureComponent {
             placeholder="输入配置键增加"
             size="small"
             maxLength="25"
-            style={{width: '150px'}}
+            style={{ width: '150px' }}
           />
         </span>
         <Button
           type="primary"
           size="small"
-          style={{marginLeft: 4}}
+          style={{ marginLeft: 4 }}
           onClick={() => this.handleAddKey()}
         >
           新增
@@ -240,7 +240,7 @@ class Home extends PureComponent {
         <Button
           type="danger"
           size="small"
-          style={{marginLeft: 3}}
+          style={{ marginLeft: 3 }}
           onClick={() => showConfirm(null, this.state.itemIndex)}
         >
           清空
@@ -252,7 +252,7 @@ class Home extends PureComponent {
         <Button
           type="primary"
           size="small"
-          style={{marginLeft: 3}}
+          style={{ marginLeft: 3 }}
           onClick={() => this.handleSave()}
         >
           保存
@@ -274,21 +274,21 @@ class Home extends PureComponent {
     }
 
     return (
-      <Row style={{top: '-10px'}}>
+      <Row style={{ top: '-10px' }}>
         <Col
           xl={7}
           lg={this.state.isGlobalEdit ? 24 : 12}
           md={this.state.isGlobalEdit ? 24 : 12}
           sm={24}
           xs={24}
-          style={{marginTop: '10px'}}
+          style={{ marginTop: '10px' }}
         >
-          <Card loading={loading} title="配置项" extra={itemButtonGroup} bodyStyle={{padding: 0}}>
+          <Card loading={loading} title="配置项" extra={itemButtonGroup} bodyStyle={{ padding: 0 }}>
             {!this.state.isCollapsed && (
               <Form
                 onSubmit={this.handleSubmit}
                 hideRequiredMark
-                style={{padding: '10px 15px', backgroundColor: '#fafafa'}}
+                style={{ padding: '10px 15px', backgroundColor: '#fafafa' }}
               >
                 <FormItem {...formItemLayout} label="配置项">
                   {getFieldDecorator('hkey', {
@@ -311,21 +311,21 @@ class Home extends PureComponent {
                   })(<Input placeholder="名称" />)}
                 </FormItem>
                 <FormItem
-                  wrapperCol={{xs: {span: 14, offset: 8}, sm: {span: 14, offset: 8}}}
-                  style={{marginTop: 25}}
+                  wrapperCol={{ xs: { span: 14, offset: 8 }, sm: { span: 14, offset: 8 } }}
+                  style={{ marginTop: 25 }}
                 >
                   <Button type="primary" htmlType="submit">
                     添加
                   </Button>
-                  <Button onClick={() => this.handleCollapsed()} style={{marginLeft: 8}}>
+                  <Button onClick={() => this.handleCollapsed()} style={{ marginLeft: 8 }}>
                     取消
                   </Button>
                 </FormItem>
               </Form>
             )}
 
-            <div className={styles.scrollYHidden} style={{height: this.state.height}}>
-              <div style={{height: this.state.height}}>
+            <div className={styles.scrollYHidden} style={{ height: this.state.height }}>
+              <div style={{ height: this.state.height }}>
                 <div className={styles.listGroup}>
                   {hkItems.map((item, index) => {
                     if (this.state.search && this.state.search.indexOf(item) === -1) return ''
@@ -359,10 +359,10 @@ class Home extends PureComponent {
           </Card>
         </Col>
         {!this.state.isGlobalEdit && (
-          <Col xl={7} lg={12} md={12} sm={24} xs={24} style={{marginTop: '10px'}}>
-            <Card title="配置键" extra={keyButtonGroup} bodyStyle={{padding: 0}}>
-              <div className={styles.scrollYHidden} style={{height: this.state.height}}>
-                <div style={{height: this.state.height}}>
+          <Col xl={7} lg={12} md={12} sm={24} xs={24} style={{ marginTop: '10px' }}>
+            <Card title="配置键" extra={keyButtonGroup} bodyStyle={{ padding: 0 }}>
+              <div className={styles.scrollYHidden} style={{ height: this.state.height }}>
+                <div style={{ height: this.state.height }}>
                   <div className={styles.listGroup}>
                     {keys.map((item, index) => (
                       <a
@@ -398,9 +398,9 @@ class Home extends PureComponent {
           md={24}
           sm={24}
           xs={24}
-          style={{marginTop: '10px'}}
+          style={{ marginTop: '10px' }}
         >
-          <Card title="配置值" extra={valButtonGroup} bodyStyle={{padding: '10px'}}>
+          <Card title="配置值" extra={valButtonGroup} bodyStyle={{ padding: '10px' }}>
             <textarea
               placeholder="请输入JSON格式数据"
               value={value}

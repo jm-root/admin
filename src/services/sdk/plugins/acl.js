@@ -1,11 +1,11 @@
 const name = 'acl';
 
-module.exports = function() {
+export default function() {
   const app = this;
   this.bind(name);
   const $ = app[name];
 
-  $.getUserRoles = async function(id) {
+  $.getUserRoles = async function getUserRoles(id) {
     return this.get(`/users/${id}/roles`);
   };
 
@@ -15,4 +15,4 @@ module.exports = function() {
       delete app[name];
     },
   };
-};
+}

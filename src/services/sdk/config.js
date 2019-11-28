@@ -1,6 +1,6 @@
 let config = {
   development: {
-    api: 'http://localhost:8000/api',
+    api: 'https://api.test.jamma.cn',
     log_level: 'debug',
   },
   test: {

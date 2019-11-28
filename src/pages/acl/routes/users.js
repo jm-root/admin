@@ -3,12 +3,12 @@ import { connect } from 'dva';
 import { Table, Card, Divider, Alert, Button, Icon, Input, Form, Tooltip, Modal } from 'antd';
 import router from 'umi/router';
 import moment from 'moment';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import styles from './index.less';
 
 const { Search } = Input;
 const FormItem = Form.Item;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 
 @connect(({ acl, loading }) => ({
   acl,
@@ -43,7 +43,7 @@ class UserList extends PureComponent {
     const { keyword } = this.state;
 
     this.setState({ pageSize: pagination.pageSize, page: pagination.current });
-    let payload = { rows: pagination.pageSize, page: pagination.current };
+    const payload = { rows: pagination.pageSize, page: pagination.current };
     if (keyword) payload.keyword = keyword;
     dispatch({
       type: 'acl/queryAclUsers',
@@ -51,16 +51,14 @@ class UserList extends PureComponent {
     });
   };
 
-  handleRow = (record, index) => {
-    return {
+  handleRow = (record, index) => ({
       onMouseEnter: () => {
         this.setState({ curRowIndex: index });
       }, // 鼠标移入行
       onMouseLeave: () => {
         this.setState({ curRowIndex: -1 });
       }, // 鼠标移出行
-    };
-  };
+    });
 
   handleDetail = record => {
     const { match } = this.props;
@@ -78,7 +76,7 @@ class UserList extends PureComponent {
   handleSearch = value => {
     const { dispatch, form } = this.props;
     const { pageSize } = this.state;
-    let payload = { page: 1, rows: pageSize };
+    const payload = { page: 1, rows: pageSize };
     if (value) payload.keyword = value;
     dispatch({
       type: 'acl/queryAclUsers',
@@ -118,7 +116,7 @@ class UserList extends PureComponent {
         showQuickJumper: true,
         current: Number(data.page),
         total: Number(data.total),
-        showTotal: function(total) {
+        showTotal(total) {
           return `共${total}条`;
         },
         pageSize,
@@ -160,8 +158,8 @@ class UserList extends PureComponent {
         render: (text, record, index) => {
           const rolesAry = [];
           text = text || [];
-          text.forEach(function(code) {
-            roles.forEach(function(item) {
+          text.forEach(code => {
+            roles.forEach(item => {
               if (item.code === code) {
                 if (item.title) {
                   rolesAry.push(item.title);
@@ -227,13 +225,11 @@ class UserList extends PureComponent {
         dataIndex: 'crtime',
         width: '13%',
         key: 'crtime',
-        render: (text, record, index) => {
-          return (
+        render: (text, record, index) => (
             <Fragment>
               <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>
             </Fragment>
-          );
-        },
+          ),
       },
       {
         title: '操作',

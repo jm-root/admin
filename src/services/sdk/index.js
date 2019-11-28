@@ -1,6 +1,6 @@
 import Sdk from 'jm-sdk';
 import MS from 'jm-ms/dist/browser';
-import umiRouter from 'umi/router';
+// import umiRouter from 'umi/router';
 import config from './config';
 import user from './plugins/user';
 import acl from './plugins/acl';
@@ -19,8 +19,8 @@ sdk
 const { logger } = sdk;
 logger.level = config.logLevel || 'info';
 logger.info('config:', config);
-sdk.login = function() {
-  umiRouter.push('/user/login');
+sdk.login = function login() {
+  // umiRouter.push('/user/login');
   return null;
 };
 

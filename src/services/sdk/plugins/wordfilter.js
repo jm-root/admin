@@ -5,15 +5,15 @@ export default function() {
   this.bind(name);
   const $ = app[name];
 
-  $.list = async function(opts) {
-    return this.get(`/words`, opts);
+  $.list = async function list(opts) {
+    return this.get('/words', opts);
   };
 
-  $.create = async function(opts) {
-    return this.post(`/words`, opts);
+  $.create = async function create(opts) {
+    return this.post('/words', opts);
   };
 
-  $.remove = async function(id) {
+  $.remove = async function remove(id) {
     return this.delete(`/words?id=${id}`);
   };
 

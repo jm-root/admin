@@ -16,13 +16,13 @@ import {
   Tooltip,
   Select,
 } from 'antd';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
-import styles from './index.less';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import classNames from 'classnames';
+import styles from './index.less';
 
 const FormItem = Form.Item;
-const confirm = Modal.confirm;
-const TreeNode = Tree.TreeNode;
+const { confirm } = Modal;
+const { TreeNode } = Tree;
 const { Option } = Select;
 
 @connect(({ acl, loading }) => ({
@@ -41,14 +41,17 @@ class Resources extends PureComponent {
     expandedKeys: [],
     autoExpandParent: true,
   };
+
   componentDidMount() {
     const { dispatch, match } = this.props;
     window.addEventListener('resize', this.resizeHeight);
     this.queryAclResourceTree();
   }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resizeHeight);
   }
+
   resizeHeight = () => {
     this.setState({ height: `${document.body.clientHeight - 100}px` });
   };
@@ -59,7 +62,7 @@ class Resources extends PureComponent {
       type: 'acl/queryAclResourceTree',
       payload: {},
       callback: rows => {
-        let resourceTree = [{ _id: 1, title: '默认' }].concat(rows);
+        const resourceTree = [{ _id: 1, title: '默认' }].concat(rows);
         this.setState({ resourceTree });
       },
     });
@@ -68,11 +71,11 @@ class Resources extends PureComponent {
   handleItemClick = (item, parent) => {
     const { form, dispatch } = this.props;
     form.resetFields();
-    let targetResource = Object.assign({}, item);
+    const targetResource = Object.assign({}, item);
     if (parent) {
       targetResource.pTitle = parent.title;
     }
-    let parentResource = Object.assign({}, parent);
+    const parentResource = Object.assign({}, parent);
 
     this.setState({ targetResource, parentResource, isNew: false });
   };
@@ -86,7 +89,7 @@ class Resources extends PureComponent {
       if (!err) {
         form.resetFields();
         let type = 'acl/addAclResource';
-        let update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
+        const update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
         if (!isNew) {
           values._id = targetResource._id;
           type = 'acl/updateAclResource';
@@ -97,7 +100,7 @@ class Resources extends PureComponent {
         console.log(parentResource);
         console.log(values);
         dispatch({
-          type: type,
+          type,
           payload: values,
           callback: doc => {
             // console.log(doc)
@@ -199,7 +202,7 @@ class Resources extends PureComponent {
                 loading={loading}
                 title="资源"
                 extra={itemButtonGroup}
-                bordered={true}
+                bordered
                 style={{ borderRight: '1px solid #E4EAEC' }}
                 bodyStyle={{ padding: 0, height: '100%' }}
               >
@@ -218,7 +221,7 @@ class Resources extends PureComponent {
             </Col>
 
             <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginTop: '10px' }}>
-              <Card title={'编辑资源'} bordered={false} style={{ borderLeft: '1px solid #E4EAEC' }}>
+              <Card title="编辑资源" bordered={false} style={{ borderLeft: '1px solid #E4EAEC' }}>
                 <Form onSubmit={this.handleSubmit}>
                   <FormItem {...formItemLayout} label="上级资源">
                     {getFieldDecorator('pTitle', {
@@ -228,7 +231,7 @@ class Resources extends PureComponent {
                       <Input
                         placeholder="上级资源"
                         disabled={isNew || isDefault || !!targetResource._id}
-                      />
+                      />,
                     )}
                   </FormItem>
                   <FormItem {...formItemLayout} label="编码">
@@ -244,7 +247,7 @@ class Resources extends PureComponent {
                       <Input
                         placeholder="编码(a-z|A-Z|0-9字符)"
                         disabled={isDefault || !!targetResource._id}
-                      />
+                      />,
                     )}
                   </FormItem>
                   <FormItem {...formItemLayout} label="名称">
@@ -285,7 +288,7 @@ class Resources extends PureComponent {
                         <Option key="put">改</Option>
                         <Option key="delete">删</Option>
                         <Option key="get">查</Option>
-                      </Select>
+                      </Select>,
                     )}
                   </FormItem>
                   <FormItem {...formItemLayout} label="顺序">

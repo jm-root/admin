@@ -9,13 +9,6 @@
 ### 删除
 
 ```
-functions/
-.firebaserc
-CODE_OF_CONDUCT.md
-firebase.json
-README.ru-RU.md
-README.zh-CN.md
-README.tr-TR.md
 src/pages/simple/
 
 ```
@@ -32,42 +25,33 @@ src/pages/simple/
 +    "jm-sdk": "^2.1.4",
 
 ```
-### config/config.js
 
-增加 proxy 配置
+### config/defaultSettings
 
-### src/defaultSettings
 ```
 +  title: 'Admin',
 ```
- 
-### src/components/SiderMenu/SiderMenu.js
-title
-
-### src/components/TopNavHeader/index.js
-title
 
 ### src/components/GlobalHeader/RightContent.js
-- menu triggerError
 
-### src/layouts/UserLayout
-
-### src/layouts/Footer
-links
+```
++ <Avatar menu/>
+```
 
 ### src/public/favicon.png
 
-### src/models/login.js
+### src/models/login.ts
 
-### src/services/user.js
+### src/services/login.ts
+
+### src/services/user.ts
 
 ### src/services/sdk
-
-### src/services/api
 
 依赖 sdk
 
 ### src/pages/document.ejs
+
 - title
 
 ### src/pages/User/Login.js
@@ -77,4 +61,7 @@ links
 - config
 
 配置
- 
+
+- acl
+
+权限

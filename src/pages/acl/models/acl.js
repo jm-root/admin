@@ -31,7 +31,7 @@ export default {
       const response = yield call(Api.queryAclRoles, payload);
       if (!response) return;
       if (response.err) return message.error(response.msg);
-      let roles = response.rows || [];
+      const roles = response.rows || [];
       yield put({
         type: 'save',
         payload: { roles },
@@ -116,15 +116,15 @@ export default {
       const result = yield call(Api.queryAclRoles, payload);
       if (!result) return;
       if (result.err) return message.error(result.msg);
-      let roles = result.rows || [];
+      const roles = result.rows || [];
       const perRoles = [];
-      roles.forEach(function(item) {
+      roles.forEach(item => {
         // 先增加自身没有的角色
         if (!userRoles[item.code]) {
           perRoles.push(item);
         }
       });
-      for (let key in userRoles) {
+      for (const key in userRoles) {
         // 再增加自身的角色
         if (key !== 'root') {
           perRoles.unshift(userRoles[key]);
@@ -150,7 +150,7 @@ export default {
       const response = yield call(Api.queryAclResourceTree, payload);
       if (!response) return;
       if (response.err) return message.error(response.msg);
-      let rows = response.rows || [];
+      const rows = response.rows || [];
       yield put({
         type: 'save',
         payload: { resourceTree: rows },

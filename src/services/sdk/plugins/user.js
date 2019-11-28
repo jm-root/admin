@@ -6,7 +6,7 @@ export default function() {
   const $ = app[name];
 
   $.queryUsers = async function queryUsers(opts) {
-    return this.get(`/users`, opts);
+    return this.get('/users', opts);
   };
 
   $.getUserInfo = async function getUserInfo(id) {

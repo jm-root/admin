@@ -14,7 +14,7 @@ import {
   Modal,
 } from 'antd';
 import router from 'umi/router';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import styles from './index.less';
 import { getPageQuery } from '../../../utils/utils';
 
@@ -22,7 +22,7 @@ const FormItem = Form.Item;
 const { Option } = Select;
 const { TextArea } = Input;
 const { CheckableTag } = Tag;
-const confirm = Modal.confirm;
+const { confirm } = Modal;
 
 @connect(({ acl, loading }) => ({
   acl,
@@ -37,22 +37,23 @@ class UserInfo extends PureComponent {
     cacheTags: [],
     roleOptions: [],
   };
+
   componentDidMount() {
     const self = this;
     const { dispatch, match } = this.props;
     const params = getPageQuery();
-    let id = params.id;
+    const { id } = params;
     this.setState({ id });
     dispatch({
       type: 'acl/queryAclUserInfo',
       payload: { id },
-      callback: function(info) {},
+      callback(info) {},
     });
     dispatch({
       type: 'acl/queryAclRoles',
       payload: {},
       callback: roles => {
-        let options = [];
+        const options = [];
         roles.forEach(role => {
           options.push(<Option key={role.code}>{role.title}</Option>);
         });
@@ -60,6 +61,7 @@ class UserInfo extends PureComponent {
       },
     });
   }
+
   componentWillUnmount() {}
 
   refreshStrLength = (info, field) => {
@@ -69,7 +71,7 @@ class UserInfo extends PureComponent {
       const str = info[field] || '';
       strLength[field] = str.length;
     } else {
-      strLength['nick'] = nick.length;
+      strLength.nick = nick.length;
     }
     const newObj = Object.assign({}, strLength);
     this.setState({ strLength: newObj });
@@ -81,7 +83,7 @@ class UserInfo extends PureComponent {
     if (form.getFieldError(field)) return;
     const formData = form.getFieldsValue();
     this.handleCancelEditState(field);
-    let payload = { id };
+    const payload = { id };
     payload[field] = formData[field];
     !payload.roles && (payload.roles = model.userInfo.roles);
     dispatch({
@@ -120,8 +122,8 @@ class UserInfo extends PureComponent {
 
   handleTagsChange = value => {
     const { cacheTags } = this.state;
-    let option = <Option key={value}>{value}</Option>;
-    for (let elem of cacheTags.values()) {
+    const option = <Option key={value}>{value}</Option>;
+    for (const elem of cacheTags.values()) {
       if (elem.key === option.key) return;
     }
     cacheTags.push(option);
@@ -138,8 +140,8 @@ class UserInfo extends PureComponent {
     const roles = (userInfo.roles && userInfo.roles.length && userInfo.roles) || '';
     const roleNames = [];
     roles &&
-      roles.forEach(function(code) {
-        roleData.forEach(function(role) {
+      roles.forEach(code => {
+        roleData.forEach(role => {
           if (role.code === code) {
             roleNames.push(role.title);
           }
@@ -159,7 +161,7 @@ class UserInfo extends PureComponent {
     };
 
     return (
-      <PageHeaderWrapper title={'用户详情'}>
+      <PageHeaderWrapper title="用户详情">
         <Card bordered={false}>
           <Form hideRequiredMark style={{ marginTop: 8 }}>
             <FormItem
@@ -178,8 +180,8 @@ class UserInfo extends PureComponent {
               <span className="ant-form-text">{id}</span>
             </FormItem>
             <FormItem {...formItemLayout} label="昵称">
-              {!editState['nick'] ? (
-                <Tooltip title={'点击可编辑'}>
+              {!editState.nick ? (
+                <Tooltip title="点击可编辑">
                   <span
                     className="ant-form-text"
                     style={{ whiteSpace: 'pre' }}
@@ -202,10 +204,10 @@ class UserInfo extends PureComponent {
                       maxLength="50"
                       placeholder="请输入昵称"
                       onChange={value => this.handleInputChange(value, 'nick')}
-                    />
+                    />,
                   )}
                   <span style={{ position: 'absolute', right: 10 }}>
-                    {strLength['nick'] || 0}/50
+                    {strLength.nick || 0}/50
                     <span style={{ position: 'absolute', width: '150px', marginLeft: 20 }}>
                       <Button
                         type="primary"
@@ -226,8 +228,8 @@ class UserInfo extends PureComponent {
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="标签">
-              {!editState['tags'] ? (
-                <Tooltip title={'点击可编辑'}>
+              {!editState.tags ? (
+                <Tooltip title="点击可编辑">
                   <span className="ant-form-text" onClick={() => this.handleEditState('tags')}>
                     {typeof tags === 'string'
                       ? '未设置'
@@ -243,7 +245,7 @@ class UserInfo extends PureComponent {
                   {getFieldDecorator('tags', {
                     rules: [
                       {
-                        validator: function(rule, value, callback) {
+                        validator(rule, value, callback) {
                           if (!value) return callback();
                           if (value.length > 10) {
                             rule.message = '标签数量不得超过10个';
@@ -267,7 +269,7 @@ class UserInfo extends PureComponent {
                       onSelect={this.handleTagsChange}
                     >
                       {cacheTags}
-                    </Select>
+                    </Select>,
                   )}
                   <span style={{ position: 'absolute', width: '150px', marginLeft: 10 }}>
                     <Button
@@ -288,8 +290,8 @@ class UserInfo extends PureComponent {
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="角色">
-              {!editState['roles'] ? (
-                <Tooltip title={'点击可编辑'}>
+              {!editState.roles ? (
+                <Tooltip title="点击可编辑">
                   <span className="ant-form-text" onClick={() => this.handleEditState('roles')}>
                     {typeof roles === 'string'
                       ? '未设置'
@@ -305,7 +307,7 @@ class UserInfo extends PureComponent {
                   {getFieldDecorator('roles', {
                     rules: [
                       {
-                        validator: function(rule, value, callback) {
+                        validator(rule, value, callback) {
                           if (!value) return callback();
                           if (value.length > 5) {
                             rule.message = '标签数量不得超过10个';
@@ -329,7 +331,7 @@ class UserInfo extends PureComponent {
                       onSelect={this.handleRolesChange}
                     >
                       {roleOptions}
-                    </Select>
+                    </Select>,
                   )}
                   <span style={{ position: 'absolute', width: '150px', marginLeft: 10 }}>
                     <Button

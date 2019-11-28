@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
 import { Form, Input, Select, Button, Card, Alert, AutoComplete, Tag, Table, Popover } from 'antd';
 import router from 'umi/router';
-import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -25,13 +25,14 @@ class UserCreate extends PureComponent {
     pageSize: 5,
     roleOptions: [],
   };
+
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'acl/queryAclRoles',
       payload: {},
       callback: roles => {
-        let options = [];
+        const options = [];
         roles.forEach(role => {
           options.push(<Option key={role.code}>{role.title}</Option>);
         });
@@ -39,6 +40,7 @@ class UserCreate extends PureComponent {
       },
     });
   }
+
   componentWillUnmount() {}
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
@@ -47,7 +49,7 @@ class UserCreate extends PureComponent {
     const { search } = this.state;
 
     this.setState({ pageSize: pagination.pageSize, page: pagination.current });
-    let payload = { rows: pagination.pageSize, page: pagination.current };
+    const payload = { rows: pagination.pageSize, page: pagination.current };
     if (search) payload.search = search;
     dispatch({
       type: 'acl/queryUsers',
@@ -62,8 +64,8 @@ class UserCreate extends PureComponent {
       onClick: () => {
         const nick = record.nick || '';
         form.setFieldsValue({ _id: record._id });
-        form.setFieldsValue({ nick: nick });
-        strLength['nick'] = nick.length;
+        form.setFieldsValue({ nick });
+        strLength.nick = nick.length;
         const newObj = Object.assign({}, strLength);
         this.setState({ visible: false, search: `${nick}(${record._id})`, strLength: newObj });
       }, // 鼠标点击行
@@ -112,13 +114,13 @@ class UserCreate extends PureComponent {
   };
 
   handleListPage = () => {
-    router.push(`/acl/users`);
+    router.push('/acl/users');
   };
 
   handleTagsChange = value => {
     const { cacheTags } = this.state;
-    let option = <Option key={value}>{value}</Option>;
-    for (let elem of cacheTags.values()) {
+    const option = <Option key={value}>{value}</Option>;
+    for (const elem of cacheTags.values()) {
       if (elem.key === option.key) return;
     }
     cacheTags.push(option);
@@ -127,8 +129,8 @@ class UserCreate extends PureComponent {
 
   handleRolesChange = value => {
     const { cacheRoles } = this.state;
-    let option = <Option key={value}>{value}</Option>;
-    for (let elem of cacheRoles.values()) {
+    const option = <Option key={value}>{value}</Option>;
+    for (const elem of cacheRoles.values()) {
       if (elem.key === option.key) return;
     }
     cacheRoles.push(option);
@@ -207,7 +209,7 @@ class UserCreate extends PureComponent {
         // showQuickJumper: true,
         current: Number(data.page),
         total: Number(data.total),
-        showTotal: function(total) {
+        showTotal(total) {
           return `共${total}条`;
         },
         pageSize,
@@ -255,7 +257,7 @@ class UserCreate extends PureComponent {
                     value={search}
                     onChange={value => this.handleInputSearch(value)}
                   />
-                </Popover>
+                </Popover>,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="昵称">
@@ -270,15 +272,15 @@ class UserCreate extends PureComponent {
                   maxLength="50"
                   placeholder="请输入昵称"
                   onChange={value => this.handleInputChange(value, 'nick')}
-                />
+                />,
               )}
-              <span style={{ position: 'absolute', right: 10 }}>{strLength['nick'] || 0}/50</span>
+              <span style={{ position: 'absolute', right: 10 }}>{strLength.nick || 0}/50</span>
             </FormItem>
             <FormItem {...formItemLayout} label="标签">
               {getFieldDecorator('tags', {
                 rules: [
                   {
-                    validator: function(rule, value, callback) {
+                    validator(rule, value, callback) {
                       if (!value) return callback();
                       if (value.length > 10) {
                         rule.message = '标签数量不得超过10个';
@@ -301,14 +303,14 @@ class UserCreate extends PureComponent {
                   onSelect={this.handleTagsChange}
                 >
                   {cacheTags}
-                </Select>
+                </Select>,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="角色">
               {getFieldDecorator('roles', {
                 rules: [
                   {
-                    validator: function(rule, value, callback) {
+                    validator(rule, value, callback) {
                       if (!value) return callback();
                       if (value.length > 5) {
                         rule.message = '标签数量不得超过10个';
@@ -331,7 +333,7 @@ class UserCreate extends PureComponent {
                   onSelect={this.handleRolesChange}
                 >
                   {roleOptions}
-                </Select>
+                </Select>,
               )}
             </FormItem>
             <FormItem {...submitFormLayout} style={{ marginTop: 32 }}>
