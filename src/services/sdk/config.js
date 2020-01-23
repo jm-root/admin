@@ -1,10 +1,10 @@
 let config = {
   development: {
-    api: 'https://api.test.jamma.cn',
+    api: 'http://api.test.jamma.cn',
     log_level: 'debug',
   },
   test: {
-    api: 'https://api.test.jamma.cn',
+    api: 'http://api.test.jamma.cn',
   },
   production: {
     api: 'https://api.jamma.cn',
