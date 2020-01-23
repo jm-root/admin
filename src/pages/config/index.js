@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react'
-import { connect } from 'dva'
-import { Card, Col, Row, Button, Icon, Input, Form, message, Modal } from 'antd'
-import classNames from 'classnames'
-import styles from './index.less'
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { Card, Col, Row, Button, Icon, Input, Form, message, Modal } from 'antd';
+import classNames from 'classnames';
+import styles from './index.less';
 
-const FormItem = Form.Item
-const { confirm } = Modal
+const FormItem = Form.Item;
+const { confirm } = Modal;
 
 @connect(({ config, loading }) => ({
   config,
@@ -21,154 +21,160 @@ class Home extends PureComponent {
     key: '',
     isCollapsed: true,
     isGlobalEdit: false,
-  }
+  };
 
-  componentDidMount () {
-    const { resizeHeight } = this
-    const { dispatch } = this.props
-    window.addEventListener('resize', resizeHeight)
+  componentDidMount() {
+    const { resizeHeight } = this;
+    const { dispatch } = this.props;
+    window.addEventListener('resize', resizeHeight);
     dispatch({
       type: 'config/fetchConfigRoots',
-    })
+    });
   }
 
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.resizeHeight)
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeHeight);
   }
 
   resizeHeight = () => {
-    this.setState({ height: `${document.body.clientHeight - 328}px` })
-  }
+    this.setState({ height: `${document.body.clientHeight - 328}px` });
+  };
 
   handleItemClick = (item, index) => {
-    const { config: model, dispatch } = this.props
-    const { hkeys } = model
-    const hkey = hkeys[index]
-    const { isGlobalEdit } = this.state
+    const { config: model, dispatch } = this.props;
+    const { hkeys } = model;
+    const hkey = hkeys[index];
+    const { isGlobalEdit } = this.state;
     dispatch({
       type: 'config/clearValue',
-    })
+    });
     dispatch({
       type: 'config/fetchConfigHKey',
       payload: { isGlobal: isGlobalEdit, hkey },
-    })
-    this.setState({ itemIndex: index, keyIndex: -1 })
-  }
+    });
+    this.setState({ itemIndex: index, keyIndex: -1 });
+  };
 
   handleKeyClick = (item, index) => {
-    const { dispatch } = this.props
-    this.setState({ keyIndex: index })
+    const { dispatch } = this.props;
+    this.setState({ keyIndex: index });
     dispatch({
       type: 'config/fetchConfigValue',
       payload: { isGlobal: this.state.isGlobalEdit, index },
-    })
-  }
+    });
+  };
 
   handleSearchChange = e => {
-    this.setState({ search: e.target.value })
-  }
+    this.setState({ search: e.target.value });
+  };
 
   handleInputKeyChange = e => {
-    this.setState({ key: e.target.value })
-  }
+    this.setState({ key: e.target.value });
+  };
 
   handleSubmit = e => {
-    const { form } = this.props
-    e.preventDefault()
+    const { form } = this.props;
+    e.preventDefault();
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        this.handleAddHKey(values)
+        this.handleAddHKey(values);
       }
-    })
-  }
+    });
+  };
 
   handleCollapsed = () => {
-    const { isCollapsed } = this.state
-    this.setState({ isCollapsed: !isCollapsed })
-  }
+    const { isCollapsed } = this.state;
+    this.setState({ isCollapsed: !isCollapsed });
+  };
 
   handleGlobalEdit = () => {
-    const { dispatch } = this.props
-    let { isGlobalEdit } = this.state
-    isGlobalEdit = !isGlobalEdit
-    let state = { isGlobalEdit }
+    const { dispatch } = this.props;
+    let { isGlobalEdit } = this.state;
+    isGlobalEdit = !isGlobalEdit;
+    let state = { isGlobalEdit };
     dispatch({
       type: 'config/clearValue',
-    })
+    });
     if (isGlobalEdit) {
       dispatch({
         type: 'config/fetchConfigValue',
         payload: { isGlobal: isGlobalEdit, index: this.state.itemIndex },
-      })
+      });
     } else {
-      state = { ...state, itemIndex: -1, keyIndex: -1 }
+      state = { ...state, itemIndex: -1, keyIndex: -1 };
     }
 
-    this.setState(state)
-  }
+    this.setState(state);
+  };
 
   handleSave = () => {
-    const { config: model, dispatch } = this.props
-    const { hkeys, keys, value } = model
-    const root = hkeys[this.state.itemIndex]
-    const key = keys[this.state.keyIndex]
-    const payload = this.state.isGlobalEdit ? { root, value } : { root, key, value }
+    const { config: model, dispatch } = this.props;
+    const { hkeys, keys, value } = model;
+    const root = hkeys[this.state.itemIndex];
+    const key = keys[this.state.keyIndex];
+    const payload = this.state.isGlobalEdit ? { root, value } : { root, key, value };
     dispatch({
       type: 'config/saveConfigValue',
       payload,
-    })
-  }
+    });
+  };
 
   handleTextareaChange = e => {
-    const { dispatch } = this.props
+    const { dispatch } = this.props;
     dispatch({
       type: 'config/changeValue',
       payload: e.target.value,
-    })
-  }
+    });
+  };
 
   handleAddHKey = payload => {
-    const { dispatch } = this.props
+    const { dispatch } = this.props;
     dispatch({
       type: 'config/addConfigHKey',
       payload,
-    })
-    this.handleCollapsed()
-  }
+    });
+    this.handleCollapsed();
+  };
 
   handleAddKey = () => {
-    if (!this.state.key) return message.error('输入配置键')
-    const { config: model, dispatch } = this.props
-    const { hkeys } = model
-    const root = hkeys[this.state.itemIndex]
+    if (!this.state.key) {
+      message.error('输入配置键');
+      return;
+    }
+    const { config: model, dispatch } = this.props;
+    const { hkeys } = model;
+    const root = hkeys[this.state.itemIndex];
     dispatch({
       type: 'config/addConfigKey',
       payload: { root, key: this.state.key },
-    })
-  }
+    });
+  };
 
   handleDeleteConfig = (key, index) => {
-    if (!key && index === -1) return message.error('请选择要清空的内容')
-    const { config: model, dispatch } = this.props
-    const { hkeys } = model
-    const root = hkeys[index || this.state.itemIndex]
+    if (!key && index === -1) {
+      message.error('请选择要清空的内容');
+      return;
+    }
+    const { config: model, dispatch } = this.props;
+    const { hkeys } = model;
+    const root = hkeys[index || this.state.itemIndex];
     if (!key) {
       dispatch({
         type: 'config/clearValue',
-      })
+      });
     }
     dispatch({
       type: 'config/deleteConfig',
       payload: { root, key },
-    })
-    this.setState(key ? { keyIndex: -1 } : { itemIndex: -1 })
-  }
+    });
+    this.setState(key ? { keyIndex: -1 } : { itemIndex: -1 });
+  };
 
-  render () {
-    const height = `calc(${this.state.height} - 20px)`
-    const { getFieldDecorator } = this.props.form
-    const { loading, config: model } = this.props
-    const { hkItems, keys, value } = model
+  render() {
+    const height = `calc(${this.state.height} - 20px)`;
+    const { getFieldDecorator } = this.props.form;
+    const { loading, config: model } = this.props;
+    const { hkItems, keys, value } = model;
 
     const formItemLayout = {
       labelCol: {
@@ -180,7 +186,7 @@ class Home extends PureComponent {
         sm: { span: 14 },
         md: { span: 14 },
       },
-    }
+    };
 
     const itemButtonGroup = (
       <span>
@@ -191,7 +197,7 @@ class Home extends PureComponent {
             placeholder="搜索"
             size="small"
             prefix={<Icon type="search" key="Icon" />}
-            maxLength="25"
+            maxLength={25}
             style={{ width: '150px' }}
           />
         </span>
@@ -216,7 +222,7 @@ class Home extends PureComponent {
           {this.state.isGlobalEdit ? '取消' : '编辑'}
         </Button>
       </span>
-    )
+    );
     const keyButtonGroup = (
       <span>
         <span>
@@ -225,7 +231,7 @@ class Home extends PureComponent {
             defaultValue={this.state.key}
             placeholder="输入配置键增加"
             size="small"
-            maxLength="25"
+            maxLength={25}
             style={{ width: '150px' }}
           />
         </span>
@@ -246,7 +252,7 @@ class Home extends PureComponent {
           清空
         </Button>
       </span>
-    )
+    );
     const valButtonGroup = (
       <span>
         <Button
@@ -258,19 +264,19 @@ class Home extends PureComponent {
           保存
         </Button>
       </span>
-    )
+    );
 
-    const self = this
+    const self = this;
 
-    function showConfirm (item, index) {
+    function showConfirm(item, index) {
       confirm({
         title: '提示',
         content: '是否确定删除?',
-        onOk () {
-          self.handleDeleteConfig(item, index)
+        onOk() {
+          self.handleDeleteConfig(item, index);
         },
-        onCancel () {},
-      })
+        onCancel() {},
+      });
     }
 
     return (
@@ -328,7 +334,7 @@ class Home extends PureComponent {
               <div style={{ height: this.state.height }}>
                 <div className={styles.listGroup}>
                   {hkItems.map((item, index) => {
-                    if (this.state.search && this.state.search.indexOf(item) === -1) return ''
+                    if (this.state.search && this.state.search.indexOf(item) === -1) return '';
                     return (
                       <a
                         className={classNames(styles.listGroupItem, {
@@ -336,7 +342,7 @@ class Home extends PureComponent {
                         })}
                         key={item}
                         onClick={() => {
-                          this.handleItemClick(item, index)
+                          this.handleItemClick(item, index);
                         }}
                       >
                         {index !== 0 && (
@@ -345,13 +351,13 @@ class Home extends PureComponent {
                             key="Icon"
                             className={styles.hoverAction}
                             onClick={() => {
-                              showConfirm(null, index)
+                              showConfirm(null, index);
                             }}
                           />
                         )}
                         {item}
                       </a>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -371,7 +377,7 @@ class Home extends PureComponent {
                         })}
                         key={item}
                         onClick={() => {
-                          this.handleKeyClick(item, index)
+                          this.handleKeyClick(item, index);
                         }}
                       >
                         <Icon
@@ -379,7 +385,7 @@ class Home extends PureComponent {
                           key="Icon"
                           className={styles.hoverAction}
                           onClick={() => {
-                            showConfirm(item)
+                            showConfirm(item);
                           }}
                         />
                         {item}
@@ -418,8 +424,8 @@ class Home extends PureComponent {
           </Card>
         </Col>
       </Row>
-    )
+    );
   }
 }
 
-export default Home
+export default Home;

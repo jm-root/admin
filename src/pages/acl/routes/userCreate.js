@@ -1,12 +1,10 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Form, Input, Select, Button, Card, Alert, AutoComplete, Tag, Table, Popover } from 'antd';
+import { Form, Input, Select, Button, Card, Table, Popover } from 'antd';
 import router from 'umi/router';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import styles from './index.less';
 
 const FormItem = Form.Item;
-const { TextArea } = Input;
 const { Option } = Select;
 
 @connect(({ acl, loading }) => ({
@@ -21,7 +19,6 @@ class UserCreate extends PureComponent {
     cacheTags: [],
     visible: false,
     search: '',
-    page: 1,
     pageSize: 5,
     roleOptions: [],
   };
@@ -29,12 +26,12 @@ class UserCreate extends PureComponent {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'acl/queryAclRoles',
+      type: 'acl/queryRoles',
       payload: {},
       callback: roles => {
         const options = [];
         roles.forEach(role => {
-          options.push(<Option key={role.code}>{role.title}</Option>);
+          options.push(<Option key={role.id}>{role.title}</Option>);
         });
         this.setState({ roleOptions: options });
       },
@@ -43,12 +40,12 @@ class UserCreate extends PureComponent {
 
   componentWillUnmount() {}
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     console.log('pagination', pagination);
     const { dispatch } = this.props;
     const { search } = this.state;
 
-    this.setState({ pageSize: pagination.pageSize, page: pagination.current });
+    this.setState({ pageSize: pagination.pageSize });
     const payload = { rows: pagination.pageSize, page: pagination.current };
     if (search) payload.search = search;
     dispatch({
@@ -57,17 +54,17 @@ class UserCreate extends PureComponent {
     });
   };
 
-  handleRow = (record, index) => {
-    const { dispatch, form } = this.props;
+  handleRow = record => {
+    const { form } = this.props;
     const { strLength } = this.state;
     return {
       onClick: () => {
         const nick = record.nick || '';
-        form.setFieldsValue({ _id: record._id });
+        form.setFieldsValue({ id: record.id });
         form.setFieldsValue({ nick });
         strLength.nick = nick.length;
         const newObj = Object.assign({}, strLength);
-        this.setState({ visible: false, search: `${nick}(${record._id})`, strLength: newObj });
+        this.setState({ visible: false, search: `${nick}(${record.id})`, strLength: newObj });
       }, // 鼠标点击行
     };
   };
@@ -84,7 +81,7 @@ class UserCreate extends PureComponent {
   };
 
   handleInputSearch = e => {
-    const { dispatch, form } = this.props;
+    const { dispatch } = this.props;
     let str = e;
     if (typeof e !== 'string') {
       str = e.target.value;
@@ -92,7 +89,7 @@ class UserCreate extends PureComponent {
     this.setState({ search: str, visible: true });
 
     dispatch({
-      type: 'acl/queryUsers',
+      type: 'acl/searchUsers',
       payload: { search: str },
     });
   };
@@ -105,7 +102,7 @@ class UserCreate extends PureComponent {
         dispatch({
           type: 'acl/addAclUser',
           payload: values,
-          callback: doc => {
+          callback: () => {
             this.handleListPage();
           },
         });
@@ -138,10 +135,10 @@ class UserCreate extends PureComponent {
   };
 
   handleVisibleChange = visible => {
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
     this.setState({ visible });
     if (!visible) {
-      form.setFieldsValue({ _id: '' });
+      form.setFieldsValue({ id: '' });
       this.setState({ search: '' });
     }
   };
@@ -150,7 +147,7 @@ class UserCreate extends PureComponent {
     const { acl: model, submitting, form } = this.props;
     const { pageSize, strLength, cacheTags, search, roleOptions } = this.state;
     const { getFieldDecorator } = form;
-    const { users: data, roles } = model;
+    const { users: data } = model;
     const rows = data.rows || [];
 
     const formItemLayout = {
@@ -175,20 +172,17 @@ class UserCreate extends PureComponent {
     const columns = [
       {
         title: '用户ID',
-        dataIndex: '_id',
+        dataIndex: 'id',
         width: '50%',
-        key: '_id',
-        render: (text, record, index) => {
-          text = text || '';
-          return text;
-        },
+        key: 'id',
+        render: (text = '') => text,
       },
       {
         title: '昵称',
         dataIndex: 'nick',
         width: '50%',
         key: 'nick',
-        render: (text, record, index) => {
+        render: text => {
           if (text && text.length > 30) {
             text = text.slice(0, 30);
             text += '...';
@@ -219,7 +213,7 @@ class UserCreate extends PureComponent {
     const clickContent = (
       <div style={{ maxWidth: '480px' }}>
         <Table
-          rowKey="_id"
+          rowKey="id"
           dataSource={listData.list}
           columns={columns}
           pagination={listData.pagination}
@@ -235,7 +229,7 @@ class UserCreate extends PureComponent {
         <Card bordered={false}>
           <Form onSubmit={this.handleSubmit} style={{ marginTop: 8 }}>
             <FormItem {...formItemLayout} label="用户">
-              {getFieldDecorator('_id', {
+              {getFieldDecorator('id', {
                 rules: [
                   { required: true, message: '请输入昵称或用户ID搜索' },
                   { whitespace: true, message: '不能输入纯空格字符' },

@@ -8,7 +8,6 @@ import {
   Icon,
   Input,
   Form,
-  message,
   Modal,
   Switch,
   Tree,
@@ -18,6 +17,7 @@ import {
 } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import classNames from 'classnames';
+import find from 'lodash/find';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -28,35 +28,30 @@ const { Option } = Select;
 @connect(({ acl, loading }) => ({
   acl,
   loading: loading.effects['acl/queryAclUserPerRoles'],
-  resLoading: loading.effects['acl/queryAclResourceTree'],
+  resLoading: loading.effects['acl/queryResources'],
 }))
 @Form.create()
 class Roles extends PureComponent {
   state = {
     height: `${document.body.clientHeight - 360}px`,
     itemIndex: -1,
-    search: '',
-    key: '',
     isCollapsed: true,
     editStatus: -1,
     roleOptions: [],
     targetRole: {},
     resourcePer: {},
-    addPermission: {},
-    removePermission: {},
 
     expandedKeys: [],
     autoExpandParent: true,
   };
 
   componentDidMount() {
-    const { dispatch, match } = this.props;
+    const { dispatch } = this.props;
     window.addEventListener('resize', this.resizeHeight);
     this.queryAclUserPerRoles();
     dispatch({
-      type: 'acl/queryAclResourceTree',
+      type: 'acl/queryResources',
       payload: {},
-      callback: doc => {},
     });
   }
 
@@ -76,7 +71,7 @@ class Roles extends PureComponent {
       callback: roles => {
         const options = [];
         roles.forEach(role => {
-          options.push(<Option key={role.code}>{role.title}</Option>);
+          options.push(<Option key={role.id}>{role.title}</Option>);
         });
         this.setState({ roleOptions: options });
       },
@@ -89,14 +84,12 @@ class Roles extends PureComponent {
     if (itemIndex === index) return;
     dispatch({
       type: 'acl/queryAclResourcePer',
-      payload: { id: item._id, role: item.code },
+      payload: { role: item.id },
       callback: resourcePer => {
         this.setState({
           itemIndex: index,
           targetRole: item,
           resourcePer,
-          addPermission: {},
-          removePermission: {},
         });
       },
     });
@@ -112,7 +105,7 @@ class Roles extends PureComponent {
         let type = 'acl/addAclRole';
         const update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
         if (editStatus === 2) {
-          values._id = targetRole._id;
+          values.id = targetRole.id;
           type = 'acl/updateAclRole';
           delete update.itemIndex;
         }
@@ -122,7 +115,6 @@ class Roles extends PureComponent {
           type,
           payload: values,
           callback: doc => {
-            console.log(doc);
             self.setState({ targetRole: doc, ...update });
             self.queryAclUserPerRoles();
           },
@@ -151,71 +143,82 @@ class Roles extends PureComponent {
     this.setState({ isCollapsed, editStatus });
   };
 
-  changePermisssion = (e, item, type) => {
-    let { addPermission, removePermission, resourcePer, itemIndex } = this.state;
-    if (itemIndex === -1) return;
-    const { checked } = e.target;
-    const { code } = item;
-    resourcePer[code] || (resourcePer[code] = []);
-    addPermission[code] || (addPermission[code] = []);
-    removePermission[code] || (removePermission[code] = []);
-    if (checked) {
-      if (!removePermission[code] || removePermission[code].indexOf(type) === -1) {
-        if (!addPermission[code]) {
-          addPermission[code] = [type];
-        } else if (addPermission[code].indexOf(type) === -1) {
-            addPermission[code].push(type);
-          }
+  updateRoleResourcePer(parent = {}, per, flag, ary, count = 0) {
+    parent.id = ary[count];
+    const nextId = ary[++count];
+    if (nextId) {
+      let resource = {};
+      if (parent.children) {
+        resource = find(parent.children, { id: nextId });
+        !resource && (resource = {}) && parent.children.push(resource);
       } else {
-        removePermission[code].splice(removePermission[code].indexOf(type), 1);
+        parent.children = [resource];
       }
-      resourcePer[code].push(type);
+      this.updateRoleResourcePer(resource, per, flag, ary, count);
     } else {
-      if (!addPermission[code] || addPermission[code].indexOf(type) === -1) {
-        if (!removePermission[code]) {
-          removePermission[code] = [type];
-        } else if (removePermission[code].indexOf(type) === -1) {
-            removePermission[code].push(type);
-          }
+      parent.permissions || (parent.permissions = []);
+      if (flag) {
+        parent.permissions.push(per);
       } else {
-        addPermission[code].splice(addPermission[code].indexOf(type), 1);
+        const index = parent.permissions.indexOf(per);
+        index >= 0 && parent.permissions.splice(index, 1);
+        !parent.permissions.length && delete parent.permissions;
       }
-      resourcePer[code].splice(resourcePer[code].indexOf(type), 1);
     }
-    addPermission = Object.assign({}, addPermission);
-    removePermission = Object.assign({}, removePermission);
+  }
+
+  changePermisssion = (e, item, path, type) => {
+    const { targetRole, itemIndex } = this.state;
+    let { resourcePer } = this.state;
+    if (itemIndex === -1) return;
+
+    const { checked } = e.target;
+
+    targetRole.resources || (targetRole.resources = []);
+    let res = [];
+    if (path === '/') {
+      res = ['/'];
+    } else if (path[0] !== '/') {
+      res = path
+        .split('/')
+        .filter(item => !!item)
+        .map((item, index) => {
+          if (index === 0) return item;
+          return `/${item}`;
+        });
+    } else {
+      res = path
+        .split('/')
+        .filter(item => !!item)
+        .map(item => `/${item}`);
+    }
+    let targetRoot = find(targetRole.resources, { id: res[0] });
+    if (!targetRoot) {
+      targetRoot = {};
+      targetRole.resources.push(targetRoot);
+    }
+    this.updateRoleResourcePer(targetRoot, type, checked, res);
+
+    resourcePer[path] || (resourcePer[path] = []);
+    if (checked) {
+      resourcePer[path].push(type);
+    } else {
+      resourcePer[path].splice(resourcePer[path].indexOf(type), 1);
+    }
     resourcePer = Object.assign({}, resourcePer);
-    this.setState({ resourcePer, addPermission, removePermission });
+    this.setState({ resourcePer });
   };
 
   handleSave = () => {
-    const { acl: model, dispatch } = this.props;
-    let { addPermission, removePermission, targetRole } = this.state;
-    function formatPermission(ary) {
-      const allow = [];
-      for (const key in ary) {
-        if (ary.hasOwnProperty(key) && ary[key].length) {
-          const per = {
-            permissions: ary[key],
-            resources: key,
-          };
-          allow.push(per);
-        }
-      }
-      return allow;
-    }
-    addPermission = formatPermission(addPermission);
-    removePermission = formatPermission(removePermission);
+    const self = this;
+    const { dispatch } = this.props;
+    const { targetRole } = this.state;
+
     dispatch({
-      type: 'acl/updateAclRoleResource',
-      payload: {
-        id: targetRole._id,
-        roles: targetRole.code,
-        addPermission,
-        removePermission,
-      },
-      callback: doc => {
-        this.setState({ addPermission: {}, removePermission: {} });
+      type: 'acl/updateAclRole',
+      payload: targetRole,
+      callback: () => {
+        self.queryAclUserPerRoles();
       },
     });
   };
@@ -225,13 +228,13 @@ class Roles extends PureComponent {
     const { dispatch } = this.props;
     const { targetRole } = this.state;
     const update = { itemIndex: -1 };
-    if (targetRole._id === item._id) {
+    if (targetRole.id === item.id) {
       update.targetRole = {};
     }
     dispatch({
       type: 'acl/removeAclRole',
-      payload: { id: item._id },
-      callback: doc => {
+      payload: { id: item.id },
+      callback: () => {
         self.setState(update);
         self.queryAclUserPerRoles();
       },
@@ -246,7 +249,7 @@ class Roles extends PureComponent {
   };
 
   render() {
-    const height = `calc(${this.state.height} - 20px)`;
+    // const height = `calc(${this.state.height} - 20px)`;
     const {
       expandedKeys,
       autoExpandParent,
@@ -259,7 +262,7 @@ class Roles extends PureComponent {
     } = this.state;
     const { getFieldDecorator } = this.props.form;
     const { loading, resLoading, acl: model } = this.props;
-    const { perRoles, userRoles, resourceTree } = model;
+    const { perRoles, userRoles, resources } = model;
     let curRole = {};
     if (editStatus === 2) {
       curRole = targetRole;
@@ -339,6 +342,7 @@ class Roles extends PureComponent {
     );
 
     const self = this;
+
     function showConfirm(item) {
       confirm({
         title: '提示',
@@ -350,13 +354,14 @@ class Roles extends PureComponent {
       });
     }
 
-    const loop = data =>
+    const loop = (data, prefix = '') =>
       data.map(item => {
+        const path = prefix + item.id;
         const permissions = item.permissions || [];
-        const per = (itemIndex !== -1 && resourcePer[item.code]) || [];
+        const per = (itemIndex !== -1 && resourcePer[path]) || [];
         const title = (
           <span>
-            <Tooltip title={item.code} key={item._id}>
+            <Tooltip title={path} key={path}>
               {item.title}
             </Tooltip>
             <div className={styles.pullRight}>
@@ -364,7 +369,7 @@ class Roles extends PureComponent {
                 {permissions.indexOf('post') > -1 && (
                   <Checkbox
                     checked={per.indexOf('post') > -1}
-                    onChange={e => this.changePermisssion(e, item, 'post')}
+                    onChange={e => this.changePermisssion(e, item, path, 'post')}
                   />
                 )}
               </span>
@@ -372,7 +377,7 @@ class Roles extends PureComponent {
                 {permissions.indexOf('put') > -1 && (
                   <Checkbox
                     checked={per.indexOf('put') > -1}
-                    onChange={e => this.changePermisssion(e, item, 'put')}
+                    onChange={e => this.changePermisssion(e, item, path, 'put')}
                   />
                 )}
               </span>
@@ -380,7 +385,7 @@ class Roles extends PureComponent {
                 {permissions.indexOf('delete') > -1 && (
                   <Checkbox
                     checked={per.indexOf('delete') > -1}
-                    onChange={e => this.changePermisssion(e, item, 'delete')}
+                    onChange={e => this.changePermisssion(e, item, path, 'delete')}
                   />
                 )}
               </span>
@@ -388,7 +393,7 @@ class Roles extends PureComponent {
                 {permissions.indexOf('get') > -1 && (
                   <Checkbox
                     checked={per.indexOf('get') > -1}
-                    onChange={e => this.changePermisssion(e, item, 'get')}
+                    onChange={e => this.changePermisssion(e, item, path, 'get')}
                   />
                 )}
               </span>
@@ -398,19 +403,19 @@ class Roles extends PureComponent {
         if (item.children) {
           return (
             <TreeNode
-              key={item._id}
+              key={path}
               title={title}
               className={styles.bottomborder}
               selectable={false}
               style={{ padding: 0 }}
             >
-              {loop(item.children)}
+              {loop(item.children, path)}
             </TreeNode>
           );
         }
         return (
           <TreeNode
-            key={item._id}
+            key={item.id}
             title={title}
             className={styles.bottomborder}
             selectable={false}
@@ -449,14 +454,14 @@ class Roles extends PureComponent {
                       )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="编码">
-                      {getFieldDecorator('code', {
+                      {getFieldDecorator('id', {
                         rules: [
                           {
                             required: true,
                             message: '请输入编码',
                           },
                         ],
-                        initialValue: curRole.code || '',
+                        initialValue: curRole.id || '',
                       })(<Input placeholder="编码(a-z|A-Z|0-9字符)" />)}
                     </FormItem>
                     <FormItem {...formItemLayout} label="名称">
@@ -474,7 +479,7 @@ class Roles extends PureComponent {
                       {getFieldDecorator('description', {
                         rules: [
                           {
-                            required: true,
+                            required: false,
                             message: '请输入描述',
                           },
                         ],
@@ -511,30 +516,30 @@ class Roles extends PureComponent {
                   <div style={{ height: this.state.height }}>
                     <div className={styles.listGroup}>
                       {perRoles.map((item, index) => (
-                          <Tooltip title={`${item.code}:${item.description}`} key={item._id}>
-                            <a
-                              className={classNames(styles.listGroupItem, {
-                                [styles.selected]: index === this.state.itemIndex,
-                              })}
-                              key={item._id}
-                              onClick={() => {
-                                this.handleItemClick(item, index);
-                              }}
-                            >
-                              {!userRoles[item.code] && isCollapsed && (
-                                <Icon
-                                  type="close"
-                                  key="Icon"
-                                  className={styles.hoverAction}
-                                  onClick={() => {
-                                    showConfirm(item);
-                                  }}
-                                />
-                              )}
-                              {item.title}
-                            </a>
-                          </Tooltip>
-                        ))}
+                        <Tooltip title={`${item.id}:${item.description}`} key={item.id}>
+                          <a
+                            className={classNames(styles.listGroupItem, {
+                              [styles.selected]: index === this.state.itemIndex,
+                            })}
+                            key={item.id}
+                            onClick={() => {
+                              this.handleItemClick(item, index);
+                            }}
+                          >
+                            {!userRoles[item.id] && isCollapsed && (
+                              <Icon
+                                type="close"
+                                key="Icon"
+                                className={styles.hoverAction}
+                                onClick={() => {
+                                  showConfirm(item);
+                                }}
+                              />
+                            )}
+                            {item.title}
+                          </a>
+                        </Tooltip>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -577,7 +582,7 @@ class Roles extends PureComponent {
                       expandedKeys={expandedKeys}
                       autoExpandParent={autoExpandParent}
                     >
-                      {loop(resourceTree)}
+                      {loop(resources)}
                     </Tree>
                   </div>
                 </div>

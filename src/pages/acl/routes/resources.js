@@ -1,23 +1,7 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Card,
-  Col,
-  Row,
-  Button,
-  InputNumber,
-  Input,
-  Form,
-  message,
-  Modal,
-  Switch,
-  Tree,
-  Checkbox,
-  Tooltip,
-  Select,
-} from 'antd';
+import { Card, Col, Row, Button, Input, Form, Modal, Tree, Checkbox, Select } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import classNames from 'classnames';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -27,25 +11,24 @@ const { Option } = Select;
 
 @connect(({ acl, loading }) => ({
   acl,
-  loading: loading.effects['acl/queryAclResourceTree'],
+  loading: loading.effects['acl/queryResources'],
 }))
 @Form.create()
 class Resources extends PureComponent {
   state = {
     height: `${document.body.clientHeight - 100}px`,
     isNew: false,
-    resourceTree: [],
-    targetResource: {},
-    parentResource: {},
+    resources: [],
+    targetResource: null,
+    parentResource: null,
 
     expandedKeys: [],
     autoExpandParent: true,
   };
 
   componentDidMount() {
-    const { dispatch, match } = this.props;
     window.addEventListener('resize', this.resizeHeight);
-    this.queryAclResourceTree();
+    this.queryResources();
   }
 
   componentWillUnmount() {
@@ -56,56 +39,54 @@ class Resources extends PureComponent {
     this.setState({ height: `${document.body.clientHeight - 100}px` });
   };
 
-  queryAclResourceTree = () => {
+  queryResources = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'acl/queryAclResourceTree',
+      type: 'acl/queryResources',
       payload: {},
       callback: rows => {
-        const resourceTree = [{ _id: 1, title: '默认' }].concat(rows);
-        this.setState({ resourceTree });
+        this.setState({ resources: rows });
       },
     });
   };
 
   handleItemClick = (item, parent) => {
-    const { form, dispatch } = this.props;
-    form.resetFields();
-    const targetResource = Object.assign({}, item);
-    if (parent) {
-      targetResource.pTitle = parent.title;
+    const { targetResource } = this.state;
+    if (targetResource === item) {
+      item = null;
+      parent = null;
     }
-    const parentResource = Object.assign({}, parent);
-
-    this.setState({ targetResource, parentResource, isNew: false });
+    this.setState({ targetResource: item, parentResource: parent, isNew: false });
   };
 
   handleSubmit = e => {
     e.preventDefault();
-    const self = this;
     const { form, dispatch } = this.props;
-    const { isNew, targetResource, parentResource } = this.state;
+    const { isNew, parentResource, resources } = this.state;
+    let { targetResource } = this.state;
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
         form.resetFields();
-        let type = 'acl/addAclResource';
-        const update = { isCollapsed: true, editStatus: -1, itemIndex: -1 };
-        if (!isNew) {
-          values._id = targetResource._id;
-          type = 'acl/updateAclResource';
-        }
-        if (parentResource && parentResource._id != 1) {
-          values.parent = parentResource._id;
-        }
         console.log(parentResource);
         console.log(values);
+        targetResource || (targetResource = {});
+        Object.assign(targetResource, values);
+        if (isNew) {
+          if (parentResource) {
+            parentResource.children || (parentResource.children = []);
+            parentResource.children.push(targetResource);
+          } else {
+            resources.push(targetResource);
+          }
+        }
+        console.log(resources);
         dispatch({
-          type,
-          payload: values,
-          callback: doc => {
+          type: 'acl/saveResources',
+          payload: resources,
+          callback: () => {
             // console.log(doc)
-            this.setState({ targetResource: {} });
-            this.queryAclResourceTree();
+            this.setState({ targetResource: null });
+            this.queryResources();
           },
         });
       }
@@ -116,11 +97,11 @@ class Resources extends PureComponent {
     let { isNew, targetResource, parentResource } = this.state;
     isNew = !isNew;
     if (isNew) {
-      parentResource = Object.assign({}, targetResource);
-      targetResource = { pTitle: targetResource.title };
+      parentResource = targetResource;
+      targetResource = null;
     } else {
-      targetResource = Object.assign({}, parentResource);
-      parentResource = {};
+      targetResource = parentResource;
+      parentResource = null;
     }
     this.setState({ isNew, parentResource, targetResource });
   };
@@ -128,17 +109,21 @@ class Resources extends PureComponent {
   handleDelete = () => {
     const self = this;
     const { dispatch } = this.props;
-    const { targetResource } = this.state;
+    const { targetResource, parentResource, resources } = this.state;
     confirm({
       title: '提示',
       content: '是否确定删除?',
       onOk() {
+        const v = parentResource ? parentResource.children : resources;
+        const idx = v.indexOf(targetResource);
+        v.splice(idx, 1);
+        console.log(resources);
         dispatch({
-          type: 'acl/removeAclResource',
-          payload: { id: targetResource._id },
-          callback: doc => {
-            self.setState({ targetResource: {} });
-            self.queryAclResourceTree();
+          type: 'acl/saveResources',
+          payload: resources,
+          callback: () => {
+            self.setState({ targetResource: null });
+            self.queryResources();
           },
         });
       },
@@ -154,10 +139,12 @@ class Resources extends PureComponent {
   };
 
   render() {
-    const { expandedKeys, autoExpandParent, resourceTree, targetResource, isNew } = this.state;
+    const { expandedKeys, autoExpandParent, resources, targetResource, isNew } = this.state;
     const { getFieldDecorator } = this.props.form;
-    const { loading, acl: model } = this.props;
-    const isDefault = (targetResource._id && targetResource._id === 1) || false;
+    const { loading } = this.props;
+    const noTarget = !targetResource;
+    console.log('noTarget', noTarget, 'targetResource', targetResource);
+    const { id, title, description, permissions, noRecursion } = targetResource || {};
 
     const formItemLayout = {
       labelCol: {
@@ -172,10 +159,12 @@ class Resources extends PureComponent {
       },
     };
 
+    const btnTitle = noTarget ? '新增顶级资源' : '新增下级资源';
+
     const itemButtonGroup = (
       <span>
         <Button type={!isNew ? 'primary' : 'default'} size="small" onClick={() => this.handleAdd()}>
-          {!isNew ? '新增' : '取消'}
+          {!isNew ? btnTitle : '取消'}
         </Button>
       </span>
     );
@@ -185,12 +174,12 @@ class Resources extends PureComponent {
         const title = <span onClick={() => this.handleItemClick(item, parent)}>{item.title}</span>;
         if (item.children) {
           return (
-            <TreeNode key={item._id} title={title}>
+            <TreeNode key={item.id} title={title}>
               {loop(item.children, item)}
             </TreeNode>
           );
         }
-        return <TreeNode key={item._id} title={title} />;
+        return <TreeNode key={item.id} title={title} />;
       });
 
     return (
@@ -213,7 +202,7 @@ class Resources extends PureComponent {
                       expandedKeys={expandedKeys}
                       autoExpandParent={autoExpandParent}
                     >
-                      {loop(resourceTree)}
+                      {loop(resources)}
                     </Tree>
                   </div>
                 </div>
@@ -223,30 +212,19 @@ class Resources extends PureComponent {
             <Col xl={18} lg={24} md={24} sm={24} xs={24} style={{ marginTop: '10px' }}>
               <Card title="编辑资源" bordered={false} style={{ borderLeft: '1px solid #E4EAEC' }}>
                 <Form onSubmit={this.handleSubmit}>
-                  <FormItem {...formItemLayout} label="上级资源">
-                    {getFieldDecorator('pTitle', {
-                      rules: [],
-                      initialValue: targetResource.pTitle || '',
-                    })(
-                      <Input
-                        placeholder="上级资源"
-                        disabled={isNew || isDefault || !!targetResource._id}
-                      />,
-                    )}
-                  </FormItem>
                   <FormItem {...formItemLayout} label="编码">
-                    {getFieldDecorator('code', {
+                    {getFieldDecorator('id', {
                       rules: [
                         {
                           required: true,
                           message: '请输入编码',
                         },
                       ],
-                      initialValue: targetResource.code || '',
+                      initialValue: id || '',
                     })(
                       <Input
                         placeholder="编码(a-z|A-Z|0-9字符)"
-                        disabled={isDefault || !!targetResource._id}
+                        disabled={!targetResource && !isNew}
                       />,
                     )}
                   </FormItem>
@@ -258,18 +236,18 @@ class Resources extends PureComponent {
                           message: '请输入名称',
                         },
                       ],
-                      initialValue: targetResource.title || '',
+                      initialValue: title || '',
                     })(<Input placeholder="名称" />)}
                   </FormItem>
                   <FormItem {...formItemLayout} label="描述">
                     {getFieldDecorator('description', {
                       rules: [
                         {
-                          required: true,
+                          required: false,
                           message: '请输入描述',
                         },
                       ],
-                      initialValue: targetResource.description || '',
+                      initialValue: description || '',
                     })(<Input placeholder="描述" />)}
                   </FormItem>
                   <FormItem {...formItemLayout} label="权限">
@@ -280,7 +258,7 @@ class Resources extends PureComponent {
                           message: '请选择权限',
                         },
                       ],
-                      initialValue: targetResource.permissions || [],
+                      initialValue: permissions || [],
                     })(
                       <Select mode="multiple" placeholder="请选择权限">
                         <Option key="*">*</Option>
@@ -291,25 +269,14 @@ class Resources extends PureComponent {
                       </Select>,
                     )}
                   </FormItem>
-                  <FormItem {...formItemLayout} label="顺序">
-                    {getFieldDecorator('sort', {
-                      initialValue: targetResource.sort || 0,
-                    })(<InputNumber placeholder="顺序" min={0} />)}
-                  </FormItem>
                   <FormItem {...formItemLayout} label="禁止传递权限">
                     {getFieldDecorator('noRecursion', {
                       valuePropName: 'checked',
-                      initialValue: targetResource.noRecursion || false,
-                    })(<Checkbox />)}
-                  </FormItem>
-                  <FormItem {...formItemLayout} label="是否显示">
-                    {getFieldDecorator('visible', {
-                      valuePropName: 'checked',
-                      initialValue: targetResource.visible || false,
+                      initialValue: noRecursion || false,
                     })(<Checkbox />)}
                   </FormItem>
 
-                  {!isDefault && (isNew || targetResource._id !== undefined) && (
+                  {(isNew || targetResource) && (
                     <FormItem
                       wrapperCol={{ xs: { span: 14, offset: 8 }, sm: { span: 14, offset: 8 } }}
                       style={{ marginTop: 25 }}
