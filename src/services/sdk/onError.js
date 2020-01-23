@@ -32,7 +32,7 @@ export default function onError(sdk) {
         const errortext = codeMessage[data.status];
         notification.error({
           message: `请求错误 ${data.status}: ${opts.uri}`,
-          description: errortext || data.msg,
+          description: data.msg || errortext,
         });
       }
     }

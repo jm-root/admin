@@ -3,6 +3,9 @@ const fse = require('fs-extra');
 const path = require('path');
 
 class Loader {
+  private dir: string;
+  private locales: {};
+  routes: any[];
   constructor() {
     this.dir = path.join(__dirname, '../src/pages');
     this.locales = {};
@@ -15,7 +18,7 @@ class Loader {
     const { dir } = this;
     fs.readdirSync(dir)
       .filter(file => fs.statSync(path.join(dir, file)).isDirectory() && file.indexOf('.') !== 0)
-      .forEach(doc => {
+      .forEach((doc: any) => {
         this.loadApp(doc);
       });
 
@@ -23,7 +26,7 @@ class Loader {
   }
 
   // 加载 app, 合并 routes
-  loadApp(filePath) {
+  loadApp(filePath: any) {
     const { dir } = this;
     const file = path.join(dir, filePath, '/routes.json');
     if (!fs.existsSync(file)) return;
@@ -33,7 +36,7 @@ class Loader {
   }
 
   // 生成 locales/*.ts
-  loadLocales(filePath) {
+  loadLocales(filePath: any) {
     const { dir, locales } = this;
     const localePath = path.join(dir, filePath, '/locales');
     if (!fs.existsSync(localePath)) return;
@@ -41,7 +44,7 @@ class Loader {
       .filter(
         doc => fs.statSync(path.join(localePath, doc)).isFile() && doc.indexOf('.json') !== -1,
       )
-      .forEach(doc => {
+      .forEach((doc: any) => {
         const key = path.basename(doc, '.json');
         const value = fse.readJsonSync(path.join(localePath, doc));
         const file = path.join(localePath, `${key}.ts`);
@@ -51,7 +54,7 @@ class Loader {
   }
 
   // 复制 mock
-  copyMocks(filePath) {
+  copyMocks(filePath: any) {
     const { dir } = this;
     const mockPath = path.join(dir, filePath, '/mock');
     if (!fs.existsSync(mockPath)) return;

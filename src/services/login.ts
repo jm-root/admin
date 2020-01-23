@@ -12,17 +12,26 @@ export interface LoginParamsType {
 export async function fakeAccountLogin(params: LoginParamsType) {
   const { userName, password, type } = params;
   const { acl, passport, storage, store } = sdk;
-  let doc = await passport.login(userName, password);
-  storage.setJson('sso', doc);
-  store.sso = doc;
-  const { id } = doc;
-  doc = await acl.getUserRoles(id);
-  const roles = ['user', ...Object.keys(doc)];
-  return {
-    status: 'ok',
-    type,
-    currentAuthority: roles,
-  };
+  try {
+    let doc = await passport.login(userName, password);
+    storage.setJson('sso', doc);
+    store.sso = doc;
+    const { id } = doc;
+    doc = await acl.getUserRoles(id);
+    const roles = ['user', ...doc];
+    return {
+      status: 'ok',
+      type,
+      currentAuthority: roles,
+    };
+  } catch (e) {
+    console.error(e.stack);
+    return {
+      status: 'fail',
+      type,
+      currentAuthority: [],
+    };
+  }
 }
 
 export async function fakeLogout() {

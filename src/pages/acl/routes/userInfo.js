@@ -1,30 +1,15 @@
 import React, { PureComponent } from 'react';
 import { connect } from 'dva';
-import {
-  Form,
-  Input,
-  Select,
-  Button,
-  Card,
-  Tag,
-  AutoComplete,
-  Radio,
-  Icon,
-  Tooltip,
-  Modal,
-} from 'antd';
-import router from 'umi/router';
+import { Form, Input, Select, Button, Card, Tag, Icon, Tooltip } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import styles from './index.less';
 import { getPageQuery } from '../../../utils/utils';
 
 const FormItem = Form.Item;
 const { Option } = Select;
-const { TextArea } = Input;
 const { CheckableTag } = Tag;
-const { confirm } = Modal;
 
-@connect(({ acl, loading }) => ({
+@connect(({ acl }) => ({
   acl,
 }))
 @Form.create()
@@ -33,29 +18,26 @@ class UserInfo extends PureComponent {
     editState: {},
     id: '',
     strLength: {},
-    cacheRoles: [],
     cacheTags: [],
     roleOptions: [],
   };
 
   componentDidMount() {
-    const self = this;
-    const { dispatch, match } = this.props;
+    const { dispatch } = this.props;
     const params = getPageQuery();
     const { id } = params;
     this.setState({ id });
     dispatch({
       type: 'acl/queryAclUserInfo',
       payload: { id },
-      callback(info) {},
     });
     dispatch({
-      type: 'acl/queryAclRoles',
+      type: 'acl/queryRoles',
       payload: {},
       callback: roles => {
         const options = [];
         roles.forEach(role => {
-          options.push(<Option key={role.code}>{role.title}</Option>);
+          options.push(<Option key={role.id}>{role.title}</Option>);
         });
         this.setState({ roleOptions: options });
       },
@@ -89,7 +71,6 @@ class UserInfo extends PureComponent {
     dispatch({
       type: 'acl/updateAclUserInfo',
       payload,
-      callback: info => {},
     });
   };
 
@@ -139,14 +120,15 @@ class UserInfo extends PureComponent {
     const tags = (userInfo.tags && userInfo.tags.length && userInfo.tags) || '';
     const roles = (userInfo.roles && userInfo.roles.length && userInfo.roles) || '';
     const roleNames = [];
-    roles &&
-      roles.forEach(code => {
+    if (roles) {
+      roles.forEach(id => {
         roleData.forEach(role => {
-          if (role.code === code) {
+          if (role.id === id) {
             roleNames.push(role.title);
           }
         });
       });
+    }
 
     const formItemLayout = {
       labelCol: {

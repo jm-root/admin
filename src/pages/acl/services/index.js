@@ -1,15 +1,48 @@
 import { stringify } from 'qs';
 import sdk from '@/services/sdk';
 
-
-const { acl } = sdk;
+const { acl, user } = sdk;
 
 function getSSO() {
   return sdk.store.sso;
 }
 
-export async function queryAclUsers(params) {
+// 查询所有资源树
+export async function queryResources() {
+  return acl.get('/resources');
+}
+
+// 保存资源
+export async function saveResources(rows) {
+  return acl.post('/resources', { rows });
+}
+
+// 删除资源
+export async function clearResources(params) {
+  return acl.delete(`/resources/${params.id}`);
+}
+
+// 查询所有角色
+export async function queryRoles() {
+  return acl.get('/roles');
+}
+
+// 保存角色
+export async function saveRoles(rows) {
+  return acl.post('/roles', { rows });
+}
+
+// 删除角色
+export async function clearRoles(params) {
+  return acl.delete(`/roles/${params.id}`);
+}
+
+export async function queryUsers(params) {
   return acl.get(`/users?${stringify(params)}`);
+}
+
+export async function searchUsers(params) {
+  return user.get(`/users?${stringify(params)}`);
 }
 
 export async function queryAclUserInfo(params) {
@@ -24,8 +57,6 @@ export async function addAclUser(params = {}) {
 
 export async function updateAclUserInfo(params) {
   const { id } = params;
-  params.id && delete params.id;
-  params._id = id;
   return acl.post(`/users/${id}`, params);
 }
 
@@ -33,24 +64,15 @@ export async function removeAclUser(params) {
   return acl.delete(`/users/${params.id}`);
 }
 
-// 查询所有角色
-export async function queryAclRoles(params) {
-  return acl.get('/roles');
-}
-
-export async function queryUsers(params) {
-  return acl.get(`/user/users?${stringify(params)}`);
-}
-
 // 查询用户角色
-export async function queryAclUserRoles(params) {
+export async function queryAclUserRoles() {
   const tokenData = getSSO();
   const { id } = tokenData;
   return acl.get(`/users/${id}/roles`);
 }
 
 // 查询用户资源
-export async function queryAclUserResources(params) {
+export async function queryAclUserResources() {
   const tokenData = getSSO();
   const { id } = tokenData;
   return acl.get(`/users/${id}/resources`);
@@ -60,7 +82,7 @@ export async function queryAclUserResources(params) {
 export async function addAclRole(params) {
   const tokenData = getSSO();
   params.creator = tokenData.id;
-  return acl.post('/roles', params);
+  return acl.put(`/roles/${params.id}`, params);
 }
 
 // 删除角色
@@ -70,7 +92,7 @@ export async function removeAclRole(params) {
 
 // 更新角色信息
 export async function updateAclRole(params) {
-  return acl.post(`/roles/${params._id}`, params);
+  return acl.put(`/roles/${params.id}`, params);
 }
 
 // 更新角色资源
@@ -82,26 +104,5 @@ export async function updateAclRoleResource(params) {
 
 // 查询角色资源权限
 export async function queryAclRoleResources(params) {
-  const { id } = params;
-  return acl.get(`/roles/${id}/resources?${stringify(params)}`);
-}
-
-// 查询所有资源树
-export async function queryAclResourceTree(params) {
-  return acl.get('/resources/tree');
-}
-
-// 新增资源
-export async function addAclResource(params) {
-  return acl.post('/resources', params);
-}
-
-// 更新资源
-export async function updateAclResource(params) {
-  return acl.post(`/resources/${params._id}`, params);
-}
-
-// 删除资源
-export async function removeAclResource(params) {
-  return acl.delete(`/resources/${params.id}`);
+  return acl.get('/roleResources', params);
 }

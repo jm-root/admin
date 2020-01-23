@@ -63,7 +63,8 @@ export default {
         value = JSON.parse(value);
       } catch (e) {
         console.log(value);
-        return message.error('请输入JSON格式数据');
+        message.error('请输入JSON格式数据');
+        return;
       }
       payload.value = value;
       const result = yield call(saveConfigValue, payload);
@@ -84,7 +85,8 @@ export default {
       const model = yield select(state => state.config);
       const { hkeys, hkItems, configRoots } = model;
       if (hkeys.indexOf(payload.hkey) !== -1) {
-        return message.error('添加项已存在');
+        message.error('添加项已存在');
+        return;
       }
       const result = yield call(saveConfigValue, {
         root: 'root:config:roots',
@@ -109,7 +111,8 @@ export default {
       const model = yield select(state => state.config);
       const { keys, configHKey } = model;
       if (keys.indexOf(payload.key) !== -1) {
-        return message.error('添加键已存在');
+        message.error('添加键已存在');
+        return;
       }
       payload.value = {};
       const result = yield call(saveConfigValue, payload);

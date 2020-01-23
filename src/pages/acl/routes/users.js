@@ -1,23 +1,21 @@
 import React, { PureComponent, Fragment } from 'react';
 import { connect } from 'dva';
-import { Table, Card, Divider, Alert, Button, Icon, Input, Form, Tooltip, Modal } from 'antd';
+import { Table, Card, Divider, Button, Input, Form, Modal } from 'antd';
 import router from 'umi/router';
 import moment from 'moment';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import styles from './index.less';
 
 const { Search } = Input;
-const FormItem = Form.Item;
 const { confirm } = Modal;
 
 @connect(({ acl, loading }) => ({
   acl,
-  loading: loading.effects['acl/queryAclUsers'],
+  loading: loading.effects['acl/queryUsers'],
 }))
 @Form.create()
 class UserList extends PureComponent {
   state = {
-    page: 1,
     pageSize: 10,
     curRowIndex: -1,
   };
@@ -26,67 +24,66 @@ class UserList extends PureComponent {
     const { dispatch } = this.props;
     const { pageSize } = this.state;
     dispatch({
-      type: 'acl/queryAclUsers',
+      type: 'acl/queryUsers',
       payload: { page: 1, rows: pageSize },
     });
     dispatch({
-      type: 'acl/queryAclRoles',
+      type: 'acl/queryRoles',
       payload: {},
     });
   }
 
   componentWillUnmount() {}
 
-  handleStandardTableChange = (pagination, filtersArg, sorter) => {
+  handleStandardTableChange = pagination => {
     console.log('pagination', pagination);
     const { dispatch } = this.props;
     const { keyword } = this.state;
 
-    this.setState({ pageSize: pagination.pageSize, page: pagination.current });
+    this.setState({ pageSize: pagination.pageSize });
     const payload = { rows: pagination.pageSize, page: pagination.current };
     if (keyword) payload.keyword = keyword;
     dispatch({
-      type: 'acl/queryAclUsers',
+      type: 'acl/searchUsers',
       payload,
     });
   };
 
   handleRow = (record, index) => ({
-      onMouseEnter: () => {
-        this.setState({ curRowIndex: index });
-      }, // 鼠标移入行
-      onMouseLeave: () => {
-        this.setState({ curRowIndex: -1 });
-      }, // 鼠标移出行
-    });
+    onMouseEnter: () => {
+      this.setState({ curRowIndex: index });
+    }, // 鼠标移入行
+    onMouseLeave: () => {
+      this.setState({ curRowIndex: -1 });
+    }, // 鼠标移出行
+  });
 
   handleDetail = record => {
     const { match } = this.props;
     router.push({
       pathname: `${match.url}/info`,
-      search: `?id=${record._id}`,
+      search: `?id=${record.id}`,
     });
   };
 
-  handleAdd = fields => {
+  handleAdd = () => {
     const { match } = this.props;
     router.push(`${match.url}/create`);
   };
 
   handleSearch = value => {
-    const { dispatch, form } = this.props;
+    const { dispatch } = this.props;
     const { pageSize } = this.state;
     const payload = { page: 1, rows: pageSize };
     if (value) payload.keyword = value;
     dispatch({
-      type: 'acl/queryAclUsers',
+      type: 'acl/searchUsers',
       payload,
     });
     this.setState({ keyword: value });
   };
 
   handleDelete = id => {
-    const self = this;
     const { dispatch } = this.props;
     confirm({
       title: '提示',
@@ -105,7 +102,7 @@ class UserList extends PureComponent {
   };
 
   render() {
-    const { acl: model, sku, loading } = this.props;
+    const { acl: model, loading } = this.props;
     const { pageSize, curRowIndex } = this.state;
     const { userList: data, roles } = model;
     const rows = data.rows || [];
@@ -125,10 +122,10 @@ class UserList extends PureComponent {
     const columns = [
       {
         title: '用户ID',
-        dataIndex: '_id',
+        dataIndex: 'id',
         width: '10%',
-        key: '_id',
-        render: (text, record, index) => {
+        key: 'id',
+        render: text => {
           text = text || '';
           return text;
         },
@@ -138,7 +135,7 @@ class UserList extends PureComponent {
         dataIndex: 'nick',
         width: '12%',
         key: 'nick',
-        render: (text, record, index) => {
+        render: text => {
           if (text && text.length > 30) {
             text = text.slice(0, 30);
             text += '...';
@@ -155,12 +152,12 @@ class UserList extends PureComponent {
         dataIndex: 'roles',
         width: '10%',
         key: 'roles',
-        render: (text, record, index) => {
+        render: text => {
           const rolesAry = [];
           text = text || [];
-          text.forEach(code => {
+          text.forEach(id => {
             roles.forEach(item => {
-              if (item.code === code) {
+              if (item.id === id) {
                 if (item.title) {
                   rolesAry.push(item.title);
                 } else {
@@ -182,7 +179,7 @@ class UserList extends PureComponent {
         dataIndex: 'tags',
         width: '10%',
         key: 'tags',
-        render: (text, record, index) => {
+        render: text => {
           text = (text || []).join(',');
           return (
             <Fragment>
@@ -196,8 +193,7 @@ class UserList extends PureComponent {
         dataIndex: 'creator',
         width: '10%',
         key: 'creator',
-        render: (text, record, index) => {
-          text || (text = {});
+        render: (text = {}) => {
           text = text.nick;
           return (
             <Fragment>
@@ -211,7 +207,7 @@ class UserList extends PureComponent {
         dataIndex: 'status',
         width: '10%',
         key: 'status',
-        render: (text, record, index) => {
+        render: text => {
           text = text === 1 ? '正常' : '封停';
           return (
             <Fragment>
@@ -225,11 +221,11 @@ class UserList extends PureComponent {
         dataIndex: 'crtime',
         width: '13%',
         key: 'crtime',
-        render: (text, record, index) => (
-            <Fragment>
-              <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>
-            </Fragment>
-          ),
+        render: text => (
+          <Fragment>
+            <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>
+          </Fragment>
+        ),
       },
       {
         title: '操作',
@@ -240,7 +236,7 @@ class UserList extends PureComponent {
             {curRowIndex === index && (
               <span>
                 <Divider type="vertical" />
-                <a onClick={() => this.handleDelete(record._id)}>删除</a>
+                <a onClick={() => this.handleDelete(record.id)}>删除</a>
               </span>
             )}
           </Fragment>
@@ -269,7 +265,7 @@ class UserList extends PureComponent {
         >
           <div className={styles.tableList}>
             <Table
-              rowKey="_id"
+              rowKey="id"
               loading={loading}
               dataSource={listData.list}
               columns={columns}
