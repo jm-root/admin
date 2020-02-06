@@ -57,7 +57,7 @@ export async function addAclUser(params = {}) {
 
 export async function updateAclUserInfo(params) {
   const { id } = params;
-  return acl.post(`/users/${id}`, params);
+  return acl.put(`/users/${id}`, params);
 }
 
 export async function removeAclUser(params) {

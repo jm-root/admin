@@ -69,6 +69,7 @@ if (isAntDesignProPreview) {
 
 export default {
   plugins,
+  history: 'hash', // 默认是 browser
   block: {
     // 国内用户可以使用码云
     // defaultGitUrl: 'https://gitee.com/ant-design/pro-blocks',
