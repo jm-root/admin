@@ -169,21 +169,22 @@ class Resources extends PureComponent {
       </span>
     );
 
-    const loop = (rows, parent) =>
+    const loop = (rows, parent, prefix = '') =>
       rows.map(item => {
+        const path = prefix + item.id;
         const title = <span onClick={() => this.handleItemClick(item, parent)}>{item.title}</span>;
         if (item.children) {
           return (
-            <TreeNode key={item.id} title={title}>
-              {loop(item.children, item)}
+            <TreeNode key={path} title={title}>
+              {loop(item.children, item, path)}
             </TreeNode>
           );
         }
-        return <TreeNode key={item.id} title={title} />;
+        return <TreeNode key={path} title={title} />;
       });
 
     return (
-      <PageHeaderWrapper title="角色管理">
+      <PageHeaderWrapper title="资源管理">
         <Card bodyStyle={{ padding: 0 }}>
           <Row style={{ top: '-10px' }}>
             <Col xl={6} lg={24} md={24} sm={24} xs={24} style={{ marginTop: '10px' }}>
