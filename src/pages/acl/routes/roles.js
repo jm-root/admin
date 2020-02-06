@@ -18,6 +18,7 @@ import {
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import classNames from 'classnames';
 import find from 'lodash/find';
+import uniq from 'lodash/uniq';
 import styles from './index.less';
 
 const FormItem = Form.Item;
@@ -202,6 +203,7 @@ class Roles extends PureComponent {
     resourcePer[path] || (resourcePer[path] = []);
     if (checked) {
       resourcePer[path].push(type);
+      resourcePer[path] = uniq(resourcePer[path]);
     } else {
       resourcePer[path].splice(resourcePer[path].indexOf(type), 1);
     }
