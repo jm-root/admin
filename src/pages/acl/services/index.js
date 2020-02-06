@@ -104,5 +104,6 @@ export async function updateAclRoleResource(params) {
 
 // 查询角色资源权限
 export async function queryAclRoleResources(params) {
-  return acl.get('/roleResources', params);
+  const { role } = params;
+  return acl.get(`/roles/${role}/resources`);
 }
