@@ -57,7 +57,7 @@ export async function addAclUser(params = {}) {
 
 export async function updateAclUserInfo(params) {
   const { id } = params;
-  return acl.post(`/users/${id}`, params);
+  return acl.put(`/users/${id}`, params);
 }
 
 export async function removeAclUser(params) {
@@ -104,5 +104,6 @@ export async function updateAclRoleResource(params) {
 
 // 查询角色资源权限
 export async function queryAclRoleResources(params) {
-  return acl.get('/roleResources', params);
+  const { role } = params;
+  return acl.get(`/roles/${role}/resources`);
 }
