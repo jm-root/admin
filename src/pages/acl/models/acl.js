@@ -100,6 +100,21 @@ export default {
         message.error(response.msg);
         return;
       }
+
+      function pagination(page, pageSize, array) {
+        const offset = (page - 1) * pageSize;
+        return offset + pageSize >= array.length
+          ? array.slice(offset, array.length)
+          : array.slice(offset, offset + pageSize);
+      }
+
+      if (payload.keyword) {
+        response.rows = response.rows.filter(item => item.id.includes(payload.keyword) || item.nick.includes(payload.keyword));
+      }
+      response.page = payload.page;
+      response.pageSize = payload.rows;
+      response.total = response.rows.length;
+      response.rows = pagination(payload.page, payload.rows, response.rows);
       yield put({
         type: 'save',
         payload: { userList: response },
