@@ -1,0 +1,16 @@
+[
+  {
+    "name": "account.center",
+    "icon": "smile",
+    "path": "/account/center",
+    "component": "./account/center",
+    "hideInMenu": true
+  },
+  {
+    "name": "account.settings",
+    "icon": "smile",
+    "path": "/account/settings",
+    "component": "./account/settings",
+    "hideInMenu": true
+  }
+]

@@ -4,11 +4,10 @@ const path = require('path');
 
 class Loader {
   private dir: string;
-  private locales: {};
   routes: any[];
+
   constructor() {
     this.dir = path.join(__dirname, '../src/pages');
-    this.locales = {};
     this.routes = [];
     this.load();
     this.routes = this.routes.sort((a, b) => a.order - b.order); // 排序
@@ -17,7 +16,10 @@ class Loader {
   load() {
     const { dir } = this;
     fs.readdirSync(dir)
-      .filter(file => fs.statSync(path.join(dir, file)).isDirectory() && file.indexOf('.') !== 0)
+      .filter(
+        (file: { indexOf: (arg0: string) => number }) =>
+          fs.statSync(path.join(dir, file)).isDirectory() && file.indexOf('.') !== 0,
+      )
       .forEach((doc: any) => {
         this.loadApp(doc);
       });
@@ -37,12 +39,13 @@ class Loader {
 
   // 生成 locales/*.ts
   loadLocales(filePath: any) {
-    const { dir, locales } = this;
+    const { dir } = this;
     const localePath = path.join(dir, filePath, '/locales');
     if (!fs.existsSync(localePath)) return;
     fs.readdirSync(localePath)
       .filter(
-        doc => fs.statSync(path.join(localePath, doc)).isFile() && doc.indexOf('.json') !== -1,
+        (doc: { indexOf: (arg0: string) => number }) =>
+          fs.statSync(path.join(localePath, doc)).isFile() && doc.indexOf('.json') !== -1,
       )
       .forEach((doc: any) => {
         const key = path.basename(doc, '.json');

@@ -44,7 +44,7 @@ class UserList extends PureComponent {
     const payload = { rows: pagination.pageSize, page: pagination.current };
     if (keyword) payload.keyword = keyword;
     dispatch({
-      type: 'acl/searchUsers',
+      type: 'acl/queryUsers',
       payload,
     });
   };
@@ -77,7 +77,7 @@ class UserList extends PureComponent {
     const payload = { page: 1, rows: pageSize };
     if (value) payload.keyword = value;
     dispatch({
-      type: 'acl/searchUsers',
+      type: 'acl/queryUsers',
       payload,
     });
     this.setState({ keyword: value });
