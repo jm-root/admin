@@ -1,5 +1,5 @@
 import Sdk from 'jm-sdk';
-import MS from 'jm-ms/dist/browser';
+import MS from 'jm-ms';
 // import umiRouter from 'umi/router';
 import config from './config';
 import user from './plugins/user';
